@@ -3,6 +3,8 @@ import Product from '../models/Product.js';
 import Order from '../models/Order.js';
 import Contact from '../models/Contact.js';
 import Newsletter from '../models/Newsletter.js';
+import connectDB from '../config/database.js';
+import mongoose from 'mongoose';
 
 // @desc    Admin login
 // @route   POST /api/admin/login
@@ -51,6 +53,7 @@ export const adminLogin = async (req, res) => {
       admin: adminData,
     });
   } catch (error) {
+    console.error('❌ Admin login error:', error);
     res.status(400).json({
       success: false,
       message: 'Error logging in',
@@ -64,32 +67,83 @@ export const adminLogin = async (req, res) => {
 // @access  Public (for demo)
 export const getAdminStats = async (req, res) => {
   try {
-    const [totalProducts, totalOrders, totalContacts, totalSubscribers, recentOrders] = await Promise.all([
-      Product.countDocuments({ isActive: true }),
-      Order.countDocuments(),
-      Contact.countDocuments(),
-      Newsletter.countDocuments({ isActive: true }),
+    console.log('📊 Fetching admin stats...');
+
+    // Ensure database is connected
+    const dbConnected = await connectDB();
+    if (!dbConnected || mongoose.connection.readyState !== 1) {
+      console.error('❌ Database not connected');
+      return res.status(503).json({
+        success: false,
+        message: 'Database is not connected. Please try again.',
+      });
+    }
+
+    // Use Promise.allSettled to handle individual failures gracefully
+    const results = await Promise.allSettled([
+      Product.countDocuments({ isActive: true }).maxTimeMS(5000),
+      Order.countDocuments().maxTimeMS(5000),
+      Contact.countDocuments().maxTimeMS(5000),
+      Newsletter.countDocuments({ isActive: true }).maxTimeMS(5000),
       Order.find()
         .sort({ createdAt: -1 })
         .limit(5)
-        .select('_id totalAmount status shippingAddress createdAt'),
+        .select('_id totalAmount status shippingAddress createdAt')
+        .lean()
+        .maxTimeMS(5000),
     ]);
 
-    // Calculate total revenue
-    const revenueData = await Order.aggregate([
-      { $match: { status: { $ne: 'cancelled' } } },
-      { $group: { _id: null, total: { $sum: '$totalAmount' } } },
-    ]);
+    // Extract results with fallbacks
+    const [
+      productCountResult,
+      orderCountResult,
+      contactCountResult,
+      subscriberCountResult,
+      recentOrdersResult,
+    ] = results;
 
-    const totalRevenue = revenueData.length > 0 ? revenueData[0].total : 0;
+    const totalProducts = productCountResult.status === 'fulfilled' ? productCountResult.value : 0;
+    const totalOrders = orderCountResult.status === 'fulfilled' ? orderCountResult.value : 0;
+    const totalContacts = contactCountResult.status === 'fulfilled' ? contactCountResult.value : 0;
+    const totalSubscribers = subscriberCountResult.status === 'fulfilled' ? subscriberCountResult.value : 0;
+    const recentOrders = recentOrdersResult.status === 'fulfilled' ? recentOrdersResult.value : [];
 
-    // Get orders by status
-    const ordersByStatus = await Order.aggregate([
-      { $group: { _id: '$status', count: { $sum: 1 } } },
-    ]);
+    console.log(`📦 Products: ${totalProducts}, Orders: ${totalOrders}, Contacts: ${totalContacts}, Subscribers: ${totalSubscribers}`);
 
-    // Get new contacts (unread)
-    const newContacts = await Contact.countDocuments({ status: 'new' });
+    // Calculate total revenue and orders by status (only if orders query succeeded)
+    let totalRevenue = 0;
+    let ordersByStatus = {};
+    let newContacts = 0;
+
+    if (orderCountResult.status === 'fulfilled') {
+      try {
+        const revenueData = await Order.aggregate([
+          { $match: { status: { $ne: 'cancelled' } } },
+          { $group: { _id: null, total: { $sum: '$totalAmount' } } },
+        ]).maxTimeMS(5000);
+        totalRevenue = revenueData.length > 0 ? revenueData[0].total : 0;
+
+        const statusData = await Order.aggregate([
+          { $group: { _id: '$status', count: { $sum: 1 } } },
+        ]).maxTimeMS(5000);
+        ordersByStatus = statusData.reduce((acc, curr) => {
+          acc[curr._id] = curr.count;
+          return acc;
+        }, {});
+      } catch (aggError) {
+        console.warn('⚠️ Aggregation queries failed:', aggError.message);
+      }
+    }
+
+    if (contactCountResult.status === 'fulfilled') {
+      try {
+        newContacts = await Contact.countDocuments({ status: 'new' }).maxTimeMS(5000);
+      } catch (contactError) {
+        console.warn('⚠️ Contact count failed:', contactError.message);
+      }
+    }
+
+    console.log('✅ Stats fetched successfully');
 
     res.json({
       success: true,
@@ -100,14 +154,13 @@ export const getAdminStats = async (req, res) => {
         totalContacts,
         totalSubscribers,
         newContacts,
-        ordersByStatus: ordersByStatus.reduce((acc, curr) => {
-          acc[curr._id] = curr.count;
-          return acc;
-        }, {}),
+        newSubscribers: 0,
+        ordersByStatus,
         recentOrders,
       },
     });
   } catch (error) {
+    console.error('❌ Error fetching admin stats:', error);
     res.status(500).json({
       success: false,
       message: 'Error fetching admin stats',
@@ -130,6 +183,7 @@ export const getAdmins = async (req, res) => {
       admins,
     });
   } catch (error) {
+    console.error('❌ Error fetching admins:', error);
     res.status(500).json({
       success: false,
       message: 'Error fetching admins',
@@ -173,6 +227,7 @@ export const createAdmin = async (req, res) => {
       admin: adminData,
     });
   } catch (error) {
+    console.error('❌ Error creating admin:', error);
     res.status(400).json({
       success: false,
       message: 'Error creating admin',
@@ -215,6 +270,7 @@ export const updateAdmin = async (req, res) => {
       admin: adminData,
     });
   } catch (error) {
+    console.error('❌ Error updating admin:', error);
     res.status(400).json({
       success: false,
       message: 'Error updating admin',
@@ -254,6 +310,7 @@ export const deleteAdmin = async (req, res) => {
       message: 'Admin deleted successfully',
     });
   } catch (error) {
+    console.error('❌ Error deleting admin:', error);
     res.status(400).json({
       success: false,
       message: 'Error deleting admin',
@@ -296,6 +353,7 @@ export const changeAdminPassword = async (req, res) => {
       message: 'Password changed successfully',
     });
   } catch (error) {
+    console.error('❌ Error changing password:', error);
     res.status(400).json({
       success: false,
       message: 'Error changing password',
