@@ -138,13 +138,13 @@ const ProductCard = ({ product }) => {
         </div>
 
         <div className="flex items-center justify-between">
-          <span className="text-base md:text-xl font-bold text-[#D6F04C]">
+          <span className="text-[12px] md:text-xl font-bold text-[#D6F04C]">
             ${Number(product.price).toFixed(2)}
           </span>
           {product.stock > 0 ? (
-            <span className="text-[10px] md:text-xs text-green-500 font-medium">In Stock</span>
+            <span className="text-[8px] md:text-xs text-green-500 font-medium">In Stock</span>
           ) : (
-            <span className="text-[10px] md:text-xs text-red-500 font-medium">Out of Stock</span>
+            <span className="text-[8px] md:text-xs text-red-500 font-medium">Out Stock</span>
           )}
         </div>
       </div>

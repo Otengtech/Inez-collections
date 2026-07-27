@@ -48,7 +48,7 @@ const FeaturedProducts = () => {
               <Loader />
             </div>
           ) : (
-            <div className="relative grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+            <div className="relative grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-5">
               {products.slice(0, 8).map((product, index) => (
                 <ScrollReveal key={product._id} direction="up" delay={(index % 4) * 100}>
                   <div className="bg-white rounded-[1.75rem] p-3 h-full hover:-translate-y-1 transition-transform duration-300">

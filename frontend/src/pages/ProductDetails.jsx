@@ -60,7 +60,7 @@ const ProductDetailsPage = () => {
   }
 
   return (
-    <div className="section-padding mt-28">
+    <div className="section-padding mt-28 px-5 md:px-10">
       <div className="container-custom">
         <ScrollReveal direction="up">
           <Link
