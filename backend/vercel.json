@@ -1,0 +1,9 @@
+{
+  "version": 2,
+  "rewrites": [
+    {
+      "source": "/api/(.*)",
+      "destination": "https://inez-collections.vercel.app/api/$1"
+    }
+  ]
+}

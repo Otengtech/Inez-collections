@@ -1,0 +1,175 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap');
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  body {
+    font-family: 'Poppins', sans-serif;
+    background-color: #FFFFFF;
+    color: #1A1A1A;
+    overflow-x: hidden;
+  }
+
+  ::-webkit-scrollbar {
+    width: 7px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: #F5F5F5;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: linear-gradient(to bottom, #000000, #b7f37c);
+    border-radius: 3px;
+  }
+}
+
+@layer components {
+  .gold-gradient {
+    background: linear-gradient(135deg, #FFD700 0%, #C9A84C 50%, #B8860B 100%);
+  }
+
+  .gold-gradient-hover {
+    background: linear-gradient(135deg, #C9A84C 0%, #B8860B 100%);
+  }
+
+  .gold-text {
+    color: #FFD700;
+  }
+
+  .gold-border {
+    border-color: #C9A84C;
+  }
+
+  .gold-shadow {
+    box-shadow: 0 4px 20px rgba(201, 168, 76, 0.3);
+  }
+
+  .gold-shadow-hover:hover {
+    box-shadow: 0 8px 30px rgba(201, 168, 76, 0.4);
+  }
+
+  .btn-primary {
+    @apply px-6 py-3 bg-black text-white font-semibold rounded-lg transition-all duration-300 hover:bg-black-800 hover:shadow-lg;
+  }
+
+  .btn-gold {
+    @apply px-6 py-3 gold-gradient text-black font-semibold rounded-lg transition-all duration-300 hover:shadow-lg hover:scale-105;
+  }
+
+  .btn-outline-gold {
+    @apply px-6 py-3 border-2 border-gold-600 text-gold-600 font-semibold rounded-lg transition-all duration-300 hover:gold-gradient hover:text-black hover:border-transparent;
+  }
+
+  .card-hover {
+    @apply transition-all duration-300 hover:shadow-xl hover:-translate-y-1;
+  }
+
+  .section-padding {
+    @apply py-16 px-4 sm:px-6 lg:px-8;
+  }
+
+  .container-custom {
+    @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
+  }
+}
+
+/* Scroll Reveal Animation Classes */
+.reveal-item {
+  opacity: 0;
+  transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.reveal-item.reveal-visible {
+  opacity: 1;
+}
+
+.reveal-item.reveal-up {
+  transform: translateY(40px);
+}
+
+.reveal-item.reveal-up.reveal-visible {
+  transform: translateY(0);
+}
+
+.reveal-item.reveal-left {
+  transform: translateX(-50px);
+}
+
+.reveal-item.reveal-left.reveal-visible {
+  transform: translateX(0);
+}
+
+.reveal-item.reveal-right {
+  transform: translateX(50px);
+}
+
+.reveal-item.reveal-right.reveal-visible {
+  transform: translateX(0);
+}
+
+.reveal-item.reveal-scale {
+  transform: scale(0.8);
+}
+
+.reveal-item.reveal-scale.reveal-visible {
+  transform: scale(1);
+}
+
+.reveal-item.reveal-rotate {
+  transform: rotate(-10deg) scale(0.9);
+}
+
+.reveal-item.reveal-rotate.reveal-visible {
+  transform: rotate(0) scale(1);
+}
+
+/* Add to your global CSS */
+@keyframes slideUp {
+  from {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.animate-slide-up {
+  animation: slideUp 0.3s ease-out;
+}
+
+/* Sticky sidebar scrollbar styling */
+.sticky::-webkit-scrollbar {
+  width: 4px;
+}
+
+.sticky::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 10px;
+}
+
+.sticky::-webkit-scrollbar-thumb {
+  background: #d4a574;
+  border-radius: 10px;
+}
+
+/* Delay classes */
+.delay-100 { transition-delay: 0.1s; }
+.delay-200 { transition-delay: 0.2s; }
+.delay-300 { transition-delay: 0.3s; }
+.delay-400 { transition-delay: 0.4s; }
+.delay-500 { transition-delay: 0.5s; }
+.delay-600 { transition-delay: 0.6s; }
+.delay-700 { transition-delay: 0.7s; }
+.delay-800 { transition-delay: 0.8s; }
+.delay-900 { transition-delay: 0.9s; }
+.delay-1000 { transition-delay: 1s; }
