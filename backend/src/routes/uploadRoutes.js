@@ -1,65 +1,56 @@
 import express from 'express';
 import multer from 'multer';
 import { v4 as uuidv4 } from 'uuid';
-import path from 'path';
-import fs from 'fs';
-import { fileURLToPath } from 'url';
-import os from 'os';
+import { v2 as cloudinary } from 'cloudinary';
+import { CloudinaryStorage } from 'multer-storage-cloudinary';
+import dotenv from 'dotenv';
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+dotenv.config();
 
 const router = express.Router();
 
 // ============================================
-// DETECT ENVIRONMENT
+// CONFIGURE CLOUDINARY
 // ============================================
-const isVercel = process.env.VERCEL === '1' || process.env.NODE_ENV === 'production';
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+});
 
 // ============================================
-// USE /tmp FOR UPLOADS ON VERCEL
+// CONFIGURE MULTER WITH CLOUDINARY
 // ============================================
-const uploadDir = isVercel 
-  ? path.join(os.tmpdir(), 'uploads') 
-  : path.join(__dirname, '../../uploads');
-
-// Ensure uploads directory exists
-try {
-  if (!fs.existsSync(uploadDir)) {
-    fs.mkdirSync(uploadDir, { recursive: true });
-    console.log(`📁 Uploads folder created at: ${uploadDir}`);
-  }
-} catch (error) {
-  console.error('❌ Failed to create uploads directory:', error.message);
-}
-
-// ============================================
-// CONFIGURE MULTER
-// ============================================
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, uploadDir);
-  },
-  filename: (req, file, cb) => {
-    const ext = path.extname(file.originalname);
-    cb(null, `${uuidv4()}${ext}`);
+const storage = new CloudinaryStorage({
+  cloudinary: cloudinary,
+  params: {
+    folder: 'inez-collections/products',
+    allowed_formats: ['jpg', 'jpeg', 'png', 'webp', 'gif'],
+    transformation: [
+      { width: 800, height: 800, crop: 'limit' },
+      { quality: 'auto' },
+      { fetch_format: 'auto' }
+    ],
+    public_id: (req, file) => {
+      // Generate unique filename
+      const ext = file.originalname.split('.').pop();
+      return `${uuidv4()}`;
+    },
   },
 });
 
-const fileFilter = (req, file, cb) => {
-  const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'image/gif'];
-  if (allowedTypes.includes(file.mimetype)) {
-    cb(null, true);
-  } else {
-    cb(new Error('Only images are allowed (JPEG, PNG, WEBP, GIF)'), false);
-  }
-};
-
 const upload = multer({
   storage,
-  fileFilter,
   limits: {
     fileSize: 5 * 1024 * 1024, // 5MB
+  },
+  fileFilter: (req, file, cb) => {
+    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'image/gif'];
+    if (allowedTypes.includes(file.mimetype)) {
+      cb(null, true);
+    } else {
+      cb(new Error('Only images are allowed (JPEG, PNG, WEBP, GIF)'), false);
+    }
   },
 });
 
@@ -83,15 +74,16 @@ router.post('/upload', (req, res) => {
         });
       }
       
-      // Return RELATIVE PATH for both environments
-      const fileUrl = `/uploads/${req.file.filename}`;
+      // Cloudinary returns the URL
+      const fileUrl = req.file.path;
       
-      console.log('📸 Image uploaded:', fileUrl);
+      console.log('📸 Image uploaded to Cloudinary:', fileUrl);
       
       res.json({
         success: true,
         url: fileUrl,
         filename: req.file.filename,
+        public_id: req.file.filename,
         message: 'Image uploaded successfully'
       });
     } catch (error) {
@@ -125,11 +117,12 @@ router.post('/upload-multiple', (req, res) => {
       }
       
       const fileUrls = req.files.map((file) => ({
-        url: `/uploads/${file.filename}`,
+        url: file.path,
         filename: file.filename,
+        public_id: file.filename,
       }));
       
-      console.log(`📸 ${fileUrls.length} images uploaded`);
+      console.log(`📸 ${fileUrls.length} images uploaded to Cloudinary`);
       
       res.json({
         success: true,
@@ -147,16 +140,17 @@ router.post('/upload-multiple', (req, res) => {
 });
 
 // ============================================
-// DELETE IMAGE
+// DELETE IMAGE FROM CLOUDINARY
 // ============================================
-router.delete('/upload/:filename', (req, res) => {
+router.delete('/upload/:public_id', async (req, res) => {
   try {
-    const { filename } = req.params;
-    const filePath = path.join(uploadDir, filename);
+    const { public_id } = req.params;
     
-    if (fs.existsSync(filePath)) {
-      fs.unlinkSync(filePath);
-      console.log('🗑️ Image deleted:', filename);
+    // Delete from Cloudinary
+    const result = await cloudinary.uploader.destroy(`inez-collections/products/${public_id}`);
+    
+    if (result.result === 'ok') {
+      console.log('🗑️ Image deleted from Cloudinary:', public_id);
       res.json({
         success: true,
         message: 'Image deleted successfully'
@@ -164,7 +158,7 @@ router.delete('/upload/:filename', (req, res) => {
     } else {
       res.status(404).json({
         success: false,
-        message: 'File not found'
+        message: 'Image not found'
       });
     }
   } catch (error) {
