@@ -4,20 +4,38 @@ import { v4 as uuidv4 } from 'uuid';
 import path from 'path';
 import fs from 'fs';
 import { fileURLToPath } from 'url';
+import os from 'os';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const router = express.Router();
 
-// Ensure uploads directory exists - using absolute path
-const uploadDir = path.join(__dirname, '../../uploads');
-if (!fs.existsSync(uploadDir)) {
-  fs.mkdirSync(uploadDir, { recursive: true });
-  console.log('📁 Uploads folder created from uploadRoutes');
+// ============================================
+// DETECT ENVIRONMENT
+// ============================================
+const isVercel = process.env.VERCEL === '1' || process.env.NODE_ENV === 'production';
+
+// ============================================
+// USE /tmp FOR UPLOADS ON VERCEL
+// ============================================
+const uploadDir = isVercel 
+  ? path.join(os.tmpdir(), 'uploads') 
+  : path.join(__dirname, '../../uploads');
+
+// Ensure uploads directory exists
+try {
+  if (!fs.existsSync(uploadDir)) {
+    fs.mkdirSync(uploadDir, { recursive: true });
+    console.log(`📁 Uploads folder created at: ${uploadDir}`);
+  }
+} catch (error) {
+  console.error('❌ Failed to create uploads directory:', error.message);
 }
 
-// Configure multer for file upload
+// ============================================
+// CONFIGURE MULTER
+// ============================================
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     cb(null, uploadDir);
@@ -65,10 +83,8 @@ router.post('/upload', (req, res) => {
         });
       }
       
-      // Return FULL URL (not relative path)
-      const protocol = req.protocol;
-      const host = req.get('host');
-      const fileUrl = `${protocol}://${host}/uploads/${req.file.filename}`;
+      // Return RELATIVE PATH for both environments
+      const fileUrl = `/uploads/${req.file.filename}`;
       
       console.log('📸 Image uploaded:', fileUrl);
       
@@ -108,11 +124,8 @@ router.post('/upload-multiple', (req, res) => {
         });
       }
       
-      const protocol = req.protocol;
-      const host = req.get('host');
-      
       const fileUrls = req.files.map((file) => ({
-        url: `${protocol}://${host}/uploads/${file.filename}`,
+        url: `/uploads/${file.filename}`,
         filename: file.filename,
       }));
       
