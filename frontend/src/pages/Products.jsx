@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { useSearchParams } from 'react-router-dom'
+import { useSearchParams, useNavigate } from 'react-router-dom'
 import { fetchProducts, setFilters, clearFilters } from '../redux/slices/productSlice'
 import ProductGrid from '../components/products/ProductGrid'
 import ProductFilters from '../components/products/ProductFilters'
@@ -10,38 +10,71 @@ import { faSearch, faFilter, faTimes } from '@fortawesome/free-solid-svg-icons'
 
 const Products = () => {
   const dispatch = useDispatch()
+  const navigate = useNavigate()
   const [searchParams] = useSearchParams()
   const { products, loading, filters, pagination, error } = useSelector((state) => state.products)
   const [searchInput, setSearchInput] = useState('')
   const [isFilterOpen, setIsFilterOpen] = useState(false)
+  const [isInitialLoad, setIsInitialLoad] = useState(true)
 
-  // Get filters from URL params on mount
+  // Get filters from URL params on mount and when URL changes
   useEffect(() => {
     const category = searchParams.get('category')
     const search = searchParams.get('search')
+    const sort = searchParams.get('sort')
+    const page = searchParams.get('page')
+    const minPrice = searchParams.get('minPrice')
+    const maxPrice = searchParams.get('maxPrice')
+    const size = searchParams.get('size')
+    const color = searchParams.get('color')
+    const rating = searchParams.get('rating')
+    
     const newFilters = {}
     
+    // ✅ Convert category to lowercase for API
     if (category) {
-      newFilters.category = category
+      newFilters.category = category.toLowerCase()
     }
     if (search) {
       newFilters.search = search
       setSearchInput(search)
     }
+    if (sort) newFilters.sort = sort
+    if (page) newFilters.page = parseInt(page)
+    if (minPrice) newFilters.minPrice = minPrice
+    if (maxPrice) newFilters.maxPrice = maxPrice
+    if (size) newFilters.size = size
+    if (color) newFilters.color = color
+    if (rating) newFilters.rating = rating
     
-    if (Object.keys(newFilters).length > 0) {
+    // Only update if there are filters or it's the initial load
+    if (Object.keys(newFilters).length > 0 || isInitialLoad) {
+      // Set default sort if not provided
+      if (!newFilters.sort && !filters.sort) {
+        newFilters.sort = '-createdAt'
+      }
+      // Set default page if not provided
+      if (!newFilters.page) {
+        newFilters.page = 1
+      }
       dispatch(setFilters(newFilters))
+      setIsInitialLoad(false)
     }
-  }, [dispatch, searchParams])
+  }, [dispatch, searchParams, isInitialLoad])
 
   // Fetch products when filters change
   useEffect(() => {
+    // Skip initial fetch if no filters are set
+    if (!filters || Object.keys(filters).length === 0) {
+      return
+    }
+
     const fetchData = async () => {
       try {
         // Build query params
         const queryParams = {}
         Object.keys(filters).forEach(key => {
-          if (filters[key] && key !== 'page') {
+          if (filters[key] && filters[key] !== '' && key !== 'page') {
             queryParams[key] = filters[key]
           }
         })
@@ -54,6 +87,7 @@ const Products = () => {
           queryParams.sort = '-createdAt'
         }
         
+        console.log('🛒 Fetching products with params:', queryParams)
         await dispatch(fetchProducts(queryParams)).unwrap()
       } catch (error) {
         console.error('Error fetching products:', error)
@@ -61,32 +95,37 @@ const Products = () => {
     }
     
     fetchData()
-  }, [dispatch, filters.category, filters.search, filters.minPrice, filters.maxPrice, filters.size, filters.color, filters.sort, filters.page])
+  }, [dispatch, filters.category, filters.search, filters.minPrice, filters.maxPrice, filters.size, filters.color, filters.sort, filters.page, filters.rating])
 
   const handleSearch = (e) => {
     e.preventDefault()
     if (searchInput.trim()) {
       dispatch(setFilters({ search: searchInput, page: 1 }))
+      navigate(`/products?search=${encodeURIComponent(searchInput)}`)
     } else {
       dispatch(setFilters({ search: '', page: 1 }))
+      navigate('/products')
     }
   }
 
   const handlePageChange = (page) => {
     dispatch(setFilters({ page }))
+    const params = new URLSearchParams(searchParams)
+    params.set('page', page)
+    navigate(`/products?${params.toString()}`)
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
   const handleClearFilters = () => {
     dispatch(clearFilters())
     setSearchInput('')
+    navigate('/products')
   }
 
   const activeFilterCount = Object.keys(filters).filter(k => 
-    filters[k] && k !== 'page' && k !== 'sort' && filters[k] !== ''
+    filters[k] && k !== 'page' && k !== 'sort' && filters[k] !== '' && k !== 'limit'
   ).length
 
-  // Show error state
   if (error) {
     return (
       <div className="min-h-screen bg-gray-50 pt-28 px-4 sm:px-6 lg:px-10">
@@ -94,7 +133,10 @@ const Products = () => {
           <div className="text-center py-12">
             <p className="text-red-500 text-lg">Error loading products: {error}</p>
             <button 
-              onClick={() => dispatch(fetchProducts({ page: 1, sort: '-createdAt' }))}
+              onClick={() => {
+                dispatch(fetchProducts({ page: 1, sort: '-createdAt' }))
+                navigate('/products')
+              }}
               className="mt-4 px-6 py-2 bg-[#D6F04C] text-black rounded-full"
             >
               Retry
@@ -195,6 +237,7 @@ const Products = () => {
                   onClick={() => {
                     setSearchInput('')
                     dispatch(setFilters({ search: '', page: 1 }))
+                    navigate('/products')
                   }}
                   className="absolute right-12 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
                 >

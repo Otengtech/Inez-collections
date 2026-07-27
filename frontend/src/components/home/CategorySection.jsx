@@ -19,11 +19,11 @@ const ArrowUpRight = ({ className = '' }) => (
 
 const CategorySection = () => {
   const categories = [
-    { name: 'Dresses', icon: faTshirt, color: '#D6F04C', items: '120+' },
-    { name: 'Wigs', icon: faCrown, color: '#D6F04C', items: '85+' },
-    { name: 'Lip Gloss', icon: faPaintRoller, color: '#D6F04C', items: '45+' },
-    { name: 'Sandals', icon: faShoePrints, color: '#D6F04C', items: '60+' },
-    { name: 'Slippers', icon: faSocks, color: '#D6F04C', items: '40+' },
+    { name: 'Dresses', slug: 'dresses', icon: faTshirt, color: '#D6F04C', items: '120+' },
+    { name: 'Wigs', slug: 'wigs', icon: faCrown, color: '#D6F04C', items: '85+' },
+    { name: 'Lip Gloss', slug: 'lip-gloss', icon: faPaintRoller, color: '#D6F04C', items: '45+' },
+    { name: 'Sandals', slug: 'sandals', icon: faShoePrints, color: '#D6F04C', items: '60+' },
+    { name: 'Slippers', slug: 'slippers', icon: faSocks, color: '#D6F04C', items: '40+' },
   ]
 
   return (
@@ -74,7 +74,7 @@ const CategorySection = () => {
               {categories.map((category, index) => (
                 <ScrollReveal key={category.name} direction="up" delay={index * 100}>
                   <Link
-                    to={`/products?category=${category.name.toLowerCase()}`}
+                    to={`/products?category=${category.slug}`}
                     className="group relative bg-transparent rounded-2xl p-4 md:p-5 text-center hover:scale-105 transition-all duration-300 flex flex-col items-center justify-center h-full"
                   >
                     <div

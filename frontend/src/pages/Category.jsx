@@ -4,7 +4,6 @@ import { useDispatch, useSelector } from 'react-redux'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import {
   faArrowLeft,
-  faArrowRight,
   faFilter,
   faList,
   faSort,
@@ -28,14 +27,23 @@ const CategoryPage = () => {
   const dispatch = useDispatch()
   const { products, loading, filters, pagination } = useSelector((state) => state.products)
   const [isFilterOpen, setIsFilterOpen] = useState(false)
-  const [viewMode, setViewMode] = useState('grid') // 'grid' or 'list'
+  const [viewMode, setViewMode] = useState('grid')
   const [sortOpen, setSortOpen] = useState(false)
   const [priceRange, setPriceRange] = useState({ min: '', max: '' })
   const [selectedSizes, setSelectedSizes] = useState([])
   const [selectedColors, setSelectedColors] = useState([])
   const [selectedRating, setSelectedRating] = useState(0)
 
-  // Category info
+  // Category mapping - ensures slug matches database category
+  const categoryMap = {
+    dresses: 'dresses',
+    wigs: 'wigs',
+    'lip-gloss': 'lip-gloss',
+    sandals: 'sandals',
+    slippers: 'slippers',
+  }
+
+  // Category info for display
   const categoryInfo = {
     dresses: {
       title: 'Dresses',
@@ -69,6 +77,8 @@ const CategoryPage = () => {
     },
   }
 
+  // Get the correct category for API
+  const category = categoryMap[categorySlug]
   const info = categoryInfo[categorySlug] || {
     title: categorySlug?.charAt(0).toUpperCase() + categorySlug?.slice(1) || 'Category',
     description: 'Explore our collection',
@@ -87,25 +97,42 @@ const CategoryPage = () => {
     { value: '-rating', label: 'Highest Rated' },
   ]
 
+  // Fetch products when category changes
   useEffect(() => {
-    // Set category filter
-    dispatch(setFilters({ category: categorySlug }))
-    dispatch(fetchProducts({ category: categorySlug, ...filters }))
+    console.log('🔍 CategoryPage: categorySlug =', categorySlug)
+    console.log('🔍 CategoryPage: mapped category =', category)
+
+    if (!categorySlug) {
+      console.error('❌ CategoryPage: No category slug provided')
+      navigate('/products')
+      return
+    }
+
+    if (!category) {
+      console.error('❌ CategoryPage: Invalid category -', categorySlug)
+      toast.error(`Category "${categorySlug}" not found`)
+      navigate('/products')
+      return
+    }
+
+    // Clear previous state and fetch new products
+    dispatch(clearFilters())
+    dispatch(setFilters({ category }))
+    dispatch(fetchProducts({ category, limit: 20 }))
 
     return () => {
       dispatch(clearFilters())
     }
-  }, [dispatch, categorySlug])
+  }, [dispatch, categorySlug, category, navigate])
 
   const handleApplyFilters = () => {
     const filterData = {
-      category: categorySlug,
+      category,
       ...(priceRange.min && { minPrice: priceRange.min }),
       ...(priceRange.max && { maxPrice: priceRange.max }),
       ...(selectedSizes.length > 0 && { size: selectedSizes.join(',') }),
       ...(selectedColors.length > 0 && { color: selectedColors.join(',') }),
       ...(selectedRating > 0 && { rating: selectedRating }),
-      ...filters,
     }
     dispatch(fetchProducts(filterData))
     setIsFilterOpen(false)
@@ -116,18 +143,19 @@ const CategoryPage = () => {
     setSelectedSizes([])
     setSelectedColors([])
     setSelectedRating(0)
-    dispatch(fetchProducts({ category: categorySlug }))
+    dispatch(fetchProducts({ category, limit: 20 }))
     setIsFilterOpen(false)
+    toast.info('Filters cleared')
   }
 
   const handleSort = (value) => {
     dispatch(setFilters({ sort: value }))
-    dispatch(fetchProducts({ category: categorySlug, ...filters, sort: value }))
+    dispatch(fetchProducts({ category, ...filters, sort: value }))
     setSortOpen(false)
   }
 
   const handlePageChange = (page) => {
-    dispatch(fetchProducts({ category: categorySlug, ...filters, page }))
+    dispatch(fetchProducts({ category, ...filters, page }))
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
@@ -157,12 +185,18 @@ const CategoryPage = () => {
     return stars
   }
 
-  if (loading) {
+  // Show loading only on initial load
+  if (loading && products.length === 0) {
     return (
       <div className="section-padding mt-20">
         <Loader />
       </div>
     )
+  }
+
+  // If category is invalid, show message (redirect happens in useEffect)
+  if (!category) {
+    return null
   }
 
   return (
@@ -176,7 +210,7 @@ const CategoryPage = () => {
           </svg>
 
           {/* Category Header */}
-          <div className="relative bg-gradient-to-br ${info.bg} rounded-[2rem] p-6 sm:p-10 mb-6">
+          <div className={`relative bg-gradient-to-br ${info.bg} rounded-[2rem] p-6 sm:p-10 mb-6`}>
             <div className="flex items-center gap-4">
               <Link
                 to="/products"
@@ -192,7 +226,7 @@ const CategoryPage = () => {
                 <p className="text-black/50 text-sm mt-1">{info.description}</p>
               </div>
               <span className="ml-auto text-sm text-black/40 bg-white/60 px-3 py-1 rounded-full">
-                {pagination?.total || 0} products
+                {pagination?.total || products.length} products
               </span>
             </div>
           </div>

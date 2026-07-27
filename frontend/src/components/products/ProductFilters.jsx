@@ -23,7 +23,8 @@ const ProductFilters = ({ mobile, onClose }) => {
     sort: true,
   })
 
-  const categories = ['All', 'Dresses', 'Wigs', 'Lip Gloss', 'Sandals', 'Slippers']
+  // ✅ Use lowercase categories to match database
+  const categories = ['All', 'dresses', 'wigs', 'lip-gloss', 'sandals', 'slippers']
   const sizes = ['All', 'XS', 'S', 'M', 'L', 'XL', '35', '36', '37', '38', '39', '40']
   const colors = ['All', 'Black', 'White', 'Gold', 'Pink', 'Red', 'Blue', 'Brown', 'Blonde']
   const sortOptions = [
@@ -55,6 +56,13 @@ const ProductFilters = ({ mobile, onClose }) => {
   const activeFilterCount = Object.keys(filters).filter(k => 
     filters[k] && k !== 'page' && k !== 'sort' && filters[k] !== ''
   ).length
+
+  // Format category name for display
+  const formatCategoryName = (cat) => {
+    if (cat === 'All') return 'All'
+    if (cat === 'lip-gloss') return 'Lip Gloss'
+    return cat.charAt(0).toUpperCase() + cat.slice(1)
+  }
 
   return (
     <div className="space-y-1 md:space-y-2">
@@ -107,7 +115,7 @@ const ProductFilters = ({ mobile, onClose }) => {
                       : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                   }`}
                 >
-                  {cat}
+                  {formatCategoryName(cat)}
                 </button>
               ))}
             </div>

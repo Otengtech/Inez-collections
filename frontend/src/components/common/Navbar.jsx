@@ -65,19 +65,19 @@ const Navbar = () => {
   ]
 
   // Additional links for the navigation dropdown
- const navDropdownLinks = [
-  // ============ CATEGORIES ============
-  { name: 'Dresses', path: '/category/dresses', icon: faStar },
-  { name: 'Wigs', path: '/category/wigs', icon: faCrown },
-  { name: 'Lip Gloss', path: '/category/lip-gloss', icon: faPaintBrush },
-  { name: 'Sandals', path: '/category/sandals', icon: faShoePrints },
-  { name: 'Slippers', path: '/category/slippers', icon: faSocks },
-  // ============ OTHER LINKS ============
-  { name: 'New Arrivals', path: '/products?sort=new', icon: faPlus },
-  { name: 'Sale', path: '/products?category=sale', icon: faTag },
-  { name: 'Featured', path: '/products?featured=true', icon: faStar },
-  { name: 'About Us', path: '/about', icon: faStore },
-]
+  const navDropdownLinks = [
+    // ============ CATEGORIES ============
+    { name: 'Dresses', path: '/category/dresses', icon: faStar },
+    { name: 'Wigs', path: '/category/wigs', icon: faCrown },
+    { name: 'Lip Gloss', path: '/category/lip-gloss', icon: faPaintBrush },
+    { name: 'Sandals', path: '/category/sandals', icon: faShoePrints },
+    { name: 'Slippers', path: '/category/slippers', icon: faSocks },
+    // ============ OTHER LINKS ============
+    { name: 'New Arrivals', path: '/products?sort=new', icon: faPlus },
+    { name: 'Sale', path: '/products?category=sale', icon: faTag },
+    { name: 'Featured', path: '/products?featured=true', icon: faStar },
+    { name: 'About Us', path: '/about', icon: faStore },
+  ]
 
   // ALL dropdown links in ONE dropdown (Account + Management)
   const allDropdownLinks = [
@@ -107,10 +107,8 @@ const Navbar = () => {
   }, [])
 
   return (
-    <div className={`fixed top-0 left-0 right-0 z-50 px-4 sm:px-6 lg:px-10 pt-4 transition-all duration-300 ${
-      isScrolled ? 'bg-white/95 backdrop-blur-sm shadow-lg' : ''
-    }`}>
-      <nav className="max-w-7xl mx-auto bg-white rounded-full shadow-[0_4px_24px_rgba(0,0,0,0.06)] px-4 sm:px-5">
+    <div className="fixed top-0 left-0 right-0 z-50 px-4 sm:px-6 lg:px-10 pt-4 transition-all duration-300">
+      <nav className="max-w-7xl mx-auto bg-white rounded-xl md:rounded-full shadow-[0_4px_24px_rgba(0,0,0,0.06)] px-4 sm:px-5">
         <div className="flex items-center justify-between h-16 gap-3">
           {/* Logo */}
           <Link to="/" className="flex items-center gap-2 flex-shrink-0">
@@ -214,7 +212,6 @@ const Navbar = () => {
 
               {isDropdownOpen && (
                 <div className="absolute right-0 mt-2 w-64 bg-white rounded-2xl shadow-xl border border-gray-100 py-2 z-50 animate-fade-in max-h-[80vh] overflow-y-auto">
-                 
                   {Object.keys(groupedLinks).map((section) => (
                     <div key={section}>
                       <div className="px-4 py-1.5">
@@ -250,12 +247,12 @@ const Navbar = () => {
           </div>
         </div>
 
-        {/* Mobile menu */}
+        {/* Mobile menu - NO rounded corners, white background, scrollable */}
         <div className={`lg:hidden overflow-hidden transition-all duration-300 ease-in-out ${
-          isMobileMenuOpen ? 'max-h-[700px] opacity-100' : 'max-h-0 opacity-0'
+          isMobileMenuOpen ? 'max-h-[80vh] opacity-100' : 'max-h-0 opacity-0'
         }`}>
-          <div className="py-4 border-t border-gray-100">
-            <form onSubmit={handleSearch} className="px-1 mb-4">
+          <div className="bg-white py-4 border-t border-gray-100 overflow-y-auto max-h-[70vh]">
+            <form onSubmit={handleSearch} className="px-4 mb-4">
               <div className="relative">
                 <input
                   type="text"
@@ -273,14 +270,14 @@ const Navbar = () => {
               </div>
             </form>
             
-            <div className="space-y-0.5 px-1">
+            <div className="space-y-0.5 px-4">
               {/* Mobile: Main Nav Links */}
               {navLinks.map((link) => (
                 <Link
                   key={link.path}
                   to={link.path}
                   onClick={() => dispatch(closeMobileMenu())}
-                  className="block py-2.5 px-4 text-black/70 hover:text-black hover:bg-gray-100 font-medium transition-colors"
+                  className="block py-2.5 px-4 text-black/70 hover:text-black hover:bg-gray-100 font-medium transition-colors rounded-lg"
                 >
                   {link.name}
                 </Link>
@@ -294,7 +291,7 @@ const Navbar = () => {
                     key={link.path}
                     to={link.path}
                     onClick={() => dispatch(closeMobileMenu())}
-                    className="flex items-center gap-3 py-2.5 px-4 text-black/70 hover:text-black hover:bg-gray-100 font-medium transition-colors"
+                    className="flex items-center gap-3 py-2.5 px-4 text-black/70 hover:text-black hover:bg-gray-100 font-medium transition-colors rounded-lg"
                   >
                     <FontAwesomeIcon icon={link.icon} className="text-gold-600 text-sm w-5" />
                     {link.name}
@@ -312,7 +309,7 @@ const Navbar = () => {
                         key={link.path}
                         to={link.path}
                         onClick={() => dispatch(closeMobileMenu())}
-                        className="flex items-center gap-3 py-2.5 px-4 text-black/70 hover:text-black hover:bg-gray-100 font-medium transition-colors"
+                        className="flex items-center gap-3 py-2.5 px-4 text-black/70 hover:text-black hover:bg-gray-100 font-medium transition-colors rounded-lg"
                       >
                         <FontAwesomeIcon icon={link.icon} className="text-gold-600 text-sm w-5" />
                         {link.name}

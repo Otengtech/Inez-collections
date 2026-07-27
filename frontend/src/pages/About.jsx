@@ -66,27 +66,6 @@ const About = () => {
     { value: '100%', label: 'Authentic', icon: faShieldAlt },
   ]
 
-  const team = [
-    {
-      name: 'Sarah Johnson',
-      role: 'Founder & Creative Director',
-      image: 'https://randomuser.me/api/portraits/women/68.jpg',
-      bio: 'Passionate about fashion with 15+ years of industry experience.',
-    },
-    {
-      name: 'Michael Chen',
-      role: 'Head of Design',
-      image: 'https://randomuser.me/api/portraits/men/32.jpg',
-      bio: 'Award-winning designer known for innovative and timeless creations.',
-    },
-    {
-      name: 'Amara Okafor',
-      role: 'Customer Experience Lead',
-      image: 'https://randomuser.me/api/portraits/women/44.jpg',
-      bio: 'Dedicated to ensuring every customer has a memorable experience.',
-    },
-  ]
-
   return (
     <section className="relative pt-28 pb-10 px-4 sm:px-6 lg:px-10">
       <div className="max-w-7xl mx-auto">
@@ -105,13 +84,13 @@ const About = () => {
           <div className="relative text-center mb-12 md:mb-16">
             <ScrollReveal direction="up">
               <span className="inline-block px-4 py-2 bg-white/80 backdrop-blur-sm rounded-full text-sm font-medium text-black/70 mb-4 shadow-sm">
-                ✨ About Us
+                About Us
               </span>
               <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold leading-[1.05] mb-4">
                 Our <span className="text-gold-600">Story</span>
               </h1>
               <p className="text-black/50 max-w-2xl mx-auto text-sm md:text-base">
-                At Inez Collections, we believe fashion is more than just clothing — it's a form of self-expression. 
+                At Inez Collections, we believe fashion is more than just clothing — it's a form of self-expression.
                 We curate premium pieces that help you feel confident, elegant, and uniquely you.
               </p>
             </ScrollReveal>
@@ -123,17 +102,12 @@ const About = () => {
             <ScrollReveal direction="left">
               <div className="bg-white rounded-[2rem] p-6 sm:p-10 h-full min-h-[400px] flex flex-col overflow-hidden">
                 <span className="inline-flex items-center gap-2 w-fit px-4 py-2 bg-[#F4F6F2] rounded-full text-sm font-medium text-black/70 mb-6">
-                  📖 Our Journey
+                  Our Journey
                 </span>
                 <h2 className="text-3xl font-bold text-black mb-4">Who We Are</h2>
                 <p className="text-black/60 leading-relaxed mb-4">
-                  Founded in 2020, Inez Collections was born from a passion for timeless elegance and 
-                  exceptional quality. We set out to create a brand that celebrates individuality through 
-                  thoughtfully curated fashion pieces.
-                </p>
-                <p className="text-black/60 leading-relaxed mb-6">
-                  From our humble beginnings to becoming a trusted name in fashion, we remain committed to 
-                  our core values: quality, authenticity, and customer satisfaction.
+                  INEZ is a Ghanaian beauty brand that makes clothes cute, hydrating, and fun.
+                  Our signature *INEZ collection is made to give you soft, shiny all day. With cute dessert charms + a soft shine finish, its meets accessory. We believe every girl deserves to feel glossy, confident, and pampered — without the sticky feeling.
                 </p>
 
                 <div className="flex flex-wrap gap-3 mt-auto">
@@ -195,8 +169,8 @@ const About = () => {
                     <div>
                       <span className="text-3xl mb-2 block">🚀</span>
                       <h3 className="font-semibold text-black text-sm">Our Mission</h3>
-                      <p className="text-xs text-black/50 mt-1">
-                        To empower individuals through fashion that combines elegance, quality, and sustainability.
+                      <p className="text-sm text-black/50 mt-1">
+                        To provide affordable, high-quality clothes that hydrates deeply while making self-care feel fun and beautiful. We want every INEZ girl to shine inside and out. 
                       </p>
                     </div>
                     <div className="w-8 h-8 rounded-full bg-gold-100 flex items-center justify-center relative z-10">
@@ -211,8 +185,8 @@ const About = () => {
                     <div>
                       <span className="text-3xl mb-2 block">🌟</span>
                       <h3 className="font-semibold text-black text-sm">Our Vision</h3>
-                      <p className="text-xs text-black/50 mt-1">
-                        To be a global leader in sustainable luxury fashion, inspiring confidence and creativity.
+                      <p className="text-sm text-black/50 mt-1">
+                        To become Ghana’s leading inez collections brand known for hydration, cuteness, and confidence — making INEZ a household name across
                       </p>
                     </div>
                     <div className="w-8 h-8 rounded-full bg-black/10 flex items-center justify-center relative z-10">
@@ -261,7 +235,7 @@ const About = () => {
               <div className="bg-gray-900 rounded-[1.75rem] p-8 text-center overflow-hidden relative">
                 <div className="absolute top-0 right-0 w-40 h-40 bg-gold-600/10 rounded-full blur-3xl"></div>
                 <div className="absolute bottom-0 left-0 w-40 h-40 bg-gold-600/10 rounded-full blur-3xl"></div>
-                
+
                 <div className="relative z-10">
                   <h3 className="text-2xl font-bold text-white mb-2">Ready to Elevate Your Style?</h3>
                   <p className="text-white/60 mb-6 max-w-md mx-auto">
