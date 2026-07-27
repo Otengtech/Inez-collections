@@ -14,12 +14,14 @@ import Products from './pages/Products'
 import ProductDetails from './pages/ProductDetails'
 import Cart from './pages/Cart'
 import Checkout from './pages/Checkout'
+import Category from './pages/Category'
 import OrderSuccess from './pages/OrderSuccess'
 import OrderTracking from './pages/OrderTracking'
 import Contact from './pages/Contact'
 import AdminLayout from './components/admin/AdminLayout'
 import Wishlist from './pages/Whishlist'
 import Reviews from './pages/Reviews'
+import About from './pages/About'
 import AdminLogin from './components/admin/AdminLogin'
 
 function App() {
@@ -58,6 +60,8 @@ function App() {
           <Route path="/order-tracking/:orderId" element={<OrderTracking />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/admin-login" element={<AdminLogin />} />
+          <Route path="/about" element={<About />} />
+          <Route path="/category/:categorySlug" element={<Category />} />
           <Route path="/admin/dashboard" element={<AdminLayout />} />
           <Route path="/wishlist" element={<Wishlist />} />
           <Route path="/products/:productId/reviews" element={<Reviews />} />

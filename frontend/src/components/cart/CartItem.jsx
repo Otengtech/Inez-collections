@@ -49,7 +49,7 @@ const CartItem = ({ item }) => {
   }
 
   return (
-    <div className="group bg-white rounded-[1.75rem] p-4 md:p-6 shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-1 border border-gray-50">
+    <div className="group bg-white rounded-[1.75rem] p-6 md:p-8 shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-1 border border-gray-50">
       <div className="flex flex-col sm:flex-row gap-4 md:gap-6">
         {/* Product Image */}
         <Link 

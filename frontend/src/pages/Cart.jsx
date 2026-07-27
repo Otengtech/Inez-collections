@@ -20,7 +20,7 @@ const Cart = () => {
 
   if (items.length === 0) {
     return (
-      <div className="min-h-screen bg-gray-50 pt-20 px-4 sm:px-6 lg:px-10 flex items-center justify-center">
+      <div className="min-h-screen bg-gray-50 pt-20 px-6 sm:px-8 lg:px-10 flex items-center justify-center">
         <div className="text-center">
           <div className="w-24 h-24 md:w-32 md:h-32 bg-gray-200 rounded-full flex items-center justify-center mx-auto mb-6">
             <FontAwesomeIcon icon={faShoppingBag} className="text-4xl md:text-5xl text-gray-400" />
@@ -43,7 +43,7 @@ const Cart = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 pt-20">
-      <div className="container-custom px-4 sm:px-6 lg:px-10">
+      <div className="container-custom px-6 sm:px-8 lg:px-10">
         {/* Header */}
         <ScrollReveal direction="up">
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6 md:mb-8">
