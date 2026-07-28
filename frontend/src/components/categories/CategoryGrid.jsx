@@ -2,9 +2,9 @@ import React from 'react'
 import { Link } from 'react-router-dom'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import {
-  faDress,
+  faTshirt,        // ✅ Fixed: Replaced faDress with faTshirt
   faCrown,
-  faLipstick,
+  faPaintRoller,   // ✅ Fixed: Replaced faLipstick with faPaintRoller
   faShoePrints,
   faSocks,
 } from '@fortawesome/free-solid-svg-icons'
@@ -12,9 +12,9 @@ import ScrollReveal from '../common/ScrollReveal'
 
 const CategoryGrid = () => {
   const categories = [
-    { name: 'Dresses', icon: faDress, color: 'from-pink-400 to-rose-600', slug: 'dresses' },
+    { name: 'Dresses', icon: faTshirt, color: 'from-pink-400 to-rose-600', slug: 'dresses' },
     { name: 'Wigs', icon: faCrown, color: 'from-purple-400 to-pink-600', slug: 'wigs' },
-    { name: 'Lip Gloss', icon: faLipstick, color: 'from-red-400 to-pink-500', slug: 'lip-gloss' },
+    { name: 'Lip Gloss', icon: faPaintRoller, color: 'from-red-400 to-pink-500', slug: 'lip-gloss' },
     { name: 'Sandals', icon: faShoePrints, color: 'from-amber-400 to-orange-600', slug: 'sandals' },
     { name: 'Slippers', icon: faSocks, color: 'from-blue-400 to-indigo-600', slug: 'slippers' },
   ]

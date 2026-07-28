@@ -16,7 +16,7 @@ const CategoryFilter = () => {
   ]
 
   const handleCategoryChange = (category) => {
-    dispatch(setFilters({ category }))
+    dispatch(setFilters({ category, page: 1 })) // ✅ Reset page when filtering
   }
 
   return (
@@ -25,9 +25,9 @@ const CategoryFilter = () => {
         <button
           key={cat.value}
           onClick={() => handleCategoryChange(cat.value)}
-          className={`px-4 py-2 rounded-full transition-all ${
+          className={`px-4 py-2 rounded-full transition-all text-sm ${
             filters.category === cat.value
-              ? 'bg-gold-600 text-white shadow-md'
+              ? 'bg-[#D6F04C] text-black shadow-md'
               : 'bg-gray-100 text-black-700 hover:bg-gray-200'
           }`}
         >
