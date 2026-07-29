@@ -17,7 +17,9 @@ import {
   faUpload,
   faSpinner,
   faCheck,
-  faCloudUploadAlt
+  faCloudUploadAlt,
+  faChevronDown,
+  faChevronUp,
 } from '@fortawesome/free-solid-svg-icons'
 import { toast } from 'react-toastify'
 import api from '../../services/api'
@@ -31,6 +33,7 @@ const ProductManagement = () => {
   const [editingProduct, setEditingProduct] = useState(null)
   const [uploading, setUploading] = useState(false)
   const [uploadProgress, setUploadProgress] = useState(0)
+  const [expandedMobile, setExpandedMobile] = useState(null)
   const [formData, setFormData] = useState({
     name: '',
     category: 'dresses',
@@ -57,7 +60,6 @@ const ProductManagement = () => {
     }
   }
 
-  // Upload to backend
   const uploadImageToBackend = async (file) => {
     const formData = new FormData()
     formData.append('image', file)
@@ -72,7 +74,6 @@ const ProductManagement = () => {
           setUploadProgress(progress)
         },
       })
-      // Return the full URL or the path
       return response.data.url
     } catch (error) {
       console.error('Upload error:', error)
@@ -81,7 +82,6 @@ const ProductManagement = () => {
     }
   }
 
-  // Handle image upload with dropzone
   const onDrop = useCallback(async (acceptedFiles) => {
     if (formData.images.length + acceptedFiles.length > 5) {
       toast.error('Maximum 5 images allowed')
@@ -119,7 +119,7 @@ const ProductManagement = () => {
     accept: {
       'image/*': ['.jpeg', '.jpg', '.png', '.webp', '.gif']
     },
-    maxSize: 5242880, // 5MB
+    maxSize: 5242880,
     disabled: uploading,
   })
 
@@ -179,7 +179,6 @@ const ProductManagement = () => {
   const handleSubmit = async (e) => {
     e.preventDefault()
     
-    // Validate
     if (!formData.name.trim()) {
       toast.error('Please enter a product name')
       return
@@ -272,16 +271,16 @@ const ProductManagement = () => {
   return (
     <div>
       {/* Header */}
-      <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
         <div>
-          <h1 className="text-2xl font-bold text-black">Product Management</h1>
-          <p className="text-sm text-black/40 mt-1">Manage your store products</p>
+          <h1 className="text-xl sm:text-2xl font-bold text-black">Product Management</h1>
+          <p className="text-xs sm:text-sm text-black/40 mt-1">Manage your store products</p>
         </div>
         <button
           onClick={() => handleOpenModal()}
-          className="inline-flex items-center justify-center gap-2 bg-black text-white font-semibold px-6 py-3 rounded-xl hover:bg-black-800 transition-all duration-300 shadow-lg hover:shadow-xl hover:-translate-y-0.5"
+          className="inline-flex items-center justify-center gap-2 bg-black text-white font-semibold px-4 sm:px-6 py-2.5 sm:py-3 rounded-xl hover:bg-black-800 transition-all duration-300 shadow-lg hover:shadow-xl hover:-translate-y-0.5 text-sm sm:text-base w-full sm:w-auto"
         >
-          <FontAwesomeIcon icon={faPlus} className="text-sm" />
+          <FontAwesomeIcon icon={faPlus} className="text-xs sm:text-sm" />
           Add Product
         </button>
       </div>
@@ -289,137 +288,236 @@ const ProductManagement = () => {
       {/* Search */}
       <div className="relative mb-6">
         <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-          <FontAwesomeIcon icon={faSearch} className="text-gray-400 text-sm" />
+          <FontAwesomeIcon icon={faSearch} className="text-gray-400 text-xs sm:text-sm" />
         </div>
         <input
           type="text"
           placeholder="Search products by name or category..."
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
-          className="w-full md:w-80 px-4 py-3 pl-11 bg-[#F4F6F2] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#D6F04C]/40 focus:bg-white transition-all duration-300 text-sm border border-transparent focus:border-[#D6F04C] placeholder:text-black/30"
+          className="w-full px-4 py-3 pl-11 bg-[#F4F6F2] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#D6F04C]/40 focus:bg-white transition-all duration-300 text-sm border border-transparent focus:border-[#D6F04C] placeholder:text-black/30"
         />
       </div>
 
-      {/* Products Table */}
-      <ScrollReveal direction="up">
-        <div className="bg-white rounded-2xl shadow-sm overflow-hidden border border-gray-100/50">
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead className="bg-[#F4F6F2]">
-                <tr>
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-black/50 uppercase tracking-wider">Image</th>
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-black/50 uppercase tracking-wider">Name</th>
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-black/50 uppercase tracking-wider">Category</th>
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-black/50 uppercase tracking-wider">Price</th>
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-black/50 uppercase tracking-wider">Stock</th>
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-black/50 uppercase tracking-wider">Actions</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-100">
-                {filteredProducts.length > 0 ? (
-                  filteredProducts.map((product) => (
-                    <tr key={product._id} className="hover:bg-[#F4F6F2]/50 transition-colors">
-                      <td className="px-6 py-4">
-                        {product.images && product.images.length > 0 ? (
-                          <img
-                            src={product.images[0]}
-                            alt={product.name}
-                            className="w-12 h-12 object-cover rounded-lg"
-                            onError={(e) => {
-                              e.target.src = '/placeholder.jpg'
-                            }}
-                          />
-                        ) : (
-                          <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center">
-                            <FontAwesomeIcon icon={faImage} className="text-gray-400" />
+      {/* Products Table - Desktop */}
+      <div className="hidden md:block">
+        <ScrollReveal direction="up">
+          <div className="bg-white rounded-2xl shadow-sm overflow-hidden border border-gray-100/50">
+            <div className="overflow-x-auto">
+              <table className="w-full min-w-[700px]">
+                <thead className="bg-[#F4F6F2]">
+                  <tr>
+                    <th className="px-4 lg:px-6 py-4 text-left text-xs font-semibold text-black/50 uppercase tracking-wider">Image</th>
+                    <th className="px-4 lg:px-6 py-4 text-left text-xs font-semibold text-black/50 uppercase tracking-wider">Name</th>
+                    <th className="px-4 lg:px-6 py-4 text-left text-xs font-semibold text-black/50 uppercase tracking-wider">Category</th>
+                    <th className="px-4 lg:px-6 py-4 text-left text-xs font-semibold text-black/50 uppercase tracking-wider">Price</th>
+                    <th className="px-4 lg:px-6 py-4 text-left text-xs font-semibold text-black/50 uppercase tracking-wider">Stock</th>
+                    <th className="px-4 lg:px-6 py-4 text-left text-xs font-semibold text-black/50 uppercase tracking-wider">Actions</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-100">
+                  {filteredProducts.length > 0 ? (
+                    filteredProducts.map((product) => (
+                      <tr key={product._id} className="hover:bg-[#F4F6F2]/50 transition-colors">
+                        <td className="px-4 lg:px-6 py-4">
+                          {product.images && product.images.length > 0 ? (
+                            <img
+                              src={product.images[0]}
+                              alt={product.name}
+                              className="w-12 h-12 object-cover rounded-lg"
+                              onError={(e) => {
+                                e.target.src = '/placeholder.jpg'
+                              }}
+                            />
+                          ) : (
+                            <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center">
+                              <FontAwesomeIcon icon={faImage} className="text-gray-400" />
+                            </div>
+                          )}
+                        </td>
+                        <td className="px-4 lg:px-6 py-4 font-medium text-sm text-black">{product.name}</td>
+                        <td className="px-4 lg:px-6 py-4 capitalize text-sm text-black/70">{product.category}</td>
+                        <td className="px-4 lg:px-6 py-4 font-bold text-sm text-[#D6F04C]">₵{product.price?.toFixed(2) || '0.00'}</td>
+                        <td className="px-4 lg:px-6 py-4">
+                          <span className={`px-2 lg:px-3 py-1 rounded-full text-xs font-medium ${getStockBadge(product.stock).color}`}>
+                            {getStockBadge(product.stock).label} ({product.stock})
+                          </span>
+                        </td>
+                        <td className="px-4 lg:px-6 py-4">
+                          <div className="flex items-center gap-2">
+                            <button
+                              onClick={() => handleOpenModal(product)}
+                              className="w-8 h-8 lg:w-9 lg:h-9 rounded-lg bg-blue-50 text-blue-500 hover:bg-blue-100 transition-colors flex items-center justify-center"
+                              title="Edit product"
+                            >
+                              <FontAwesomeIcon icon={faEdit} className="text-xs sm:text-sm" />
+                            </button>
+                            <button
+                              onClick={() => handleDelete(product._id)}
+                              className="w-8 h-8 lg:w-9 lg:h-9 rounded-lg bg-red-50 text-red-500 hover:bg-red-100 transition-colors flex items-center justify-center"
+                              title="Delete product"
+                            >
+                              <FontAwesomeIcon icon={faTrash} className="text-xs sm:text-sm" />
+                            </button>
                           </div>
-                        )}
-                      </td>
-                      <td className="px-6 py-4 font-medium text-sm text-black">{product.name}</td>
-                      <td className="px-6 py-4 capitalize text-sm text-black/70">{product.category}</td>
-                      <td className="px-6 py-4 font-bold text-sm text-[#D6F04C]">₵{product.price?.toFixed(2) || '0.00'}</td>
-                      <td className="px-6 py-4">
-                        <span className={`px-3 py-1 rounded-full text-xs font-medium ${getStockBadge(product.stock).color}`}>
-                          {getStockBadge(product.stock).label} ({product.stock})
-                        </span>
-                      </td>
-                      <td className="px-6 py-4">
-                        <div className="flex items-center gap-2">
-                          <button
-                            onClick={() => handleOpenModal(product)}
-                            className="w-9 h-9 rounded-lg bg-blue-50 text-blue-500 hover:bg-blue-100 transition-colors flex items-center justify-center"
-                            title="Edit product"
-                          >
-                            <FontAwesomeIcon icon={faEdit} className="text-sm" />
-                          </button>
-                          <button
-                            onClick={() => handleDelete(product._id)}
-                            className="w-9 h-9 rounded-lg bg-red-50 text-red-500 hover:bg-red-100 transition-colors flex items-center justify-center"
-                            title="Delete product"
-                          >
-                            <FontAwesomeIcon icon={faTrash} className="text-sm" />
-                          </button>
-                        </div>
+                        </td>
+                      </tr>
+                    ))
+                  ) : (
+                    <tr>
+                      <td colSpan="6" className="px-6 py-12 text-center">
+                        <div className="text-4xl mb-3">📦</div>
+                        <p className="text-black/50 text-sm">No products found</p>
+                        <button
+                          onClick={() => handleOpenModal()}
+                          className="mt-4 text-[#D6F04C] hover:text-[#C5E043] font-medium text-sm transition-colors"
+                        >
+                          Add your first product →
+                        </button>
                       </td>
                     </tr>
-                  ))
-                ) : (
-                  <tr>
-                    <td colSpan="6" className="px-6 py-12 text-center">
-                      <div className="text-4xl mb-3">📦</div>
-                      <p className="text-black/50 text-sm">No products found</p>
-                      <button
-                        onClick={() => handleOpenModal()}
-                        className="mt-4 text-[#D6F04C] hover:text-[#C5E043] font-medium text-sm transition-colors"
-                      >
-                        Add your first product →
-                      </button>
-                    </td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
+                  )}
+                </tbody>
+              </table>
+            </div>
           </div>
-        </div>
-      </ScrollReveal>
+        </ScrollReveal>
+      </div>
 
-      {/* Add/Edit Modal */}
+      {/* Products Cards - Mobile & Tablet */}
+      <div className="md:hidden space-y-4">
+        {filteredProducts.length > 0 ? (
+          filteredProducts.map((product) => (
+            <div key={product._id} className="bg-white rounded-2xl shadow-sm overflow-hidden border border-gray-100/50">
+              <div className="p-4">
+                <div className="flex items-start gap-4">
+                  {product.images && product.images.length > 0 ? (
+                    <img
+                      src={product.images[0]}
+                      alt={product.name}
+                      className="w-20 h-20 object-cover rounded-xl"
+                      onError={(e) => {
+                        e.target.src = '/placeholder.jpg'
+                      }}
+                    />
+                  ) : (
+                    <div className="w-20 h-20 bg-gray-100 rounded-xl flex items-center justify-center">
+                      <FontAwesomeIcon icon={faImage} className="text-gray-400 text-2xl" />
+                    </div>
+                  )}
+                  
+                  <div className="flex-1 min-w-0">
+                    <h3 className="font-semibold text-sm text-black truncate">{product.name}</h3>
+                    <p className="text-xs text-black/50 capitalize">{product.category}</p>
+                    <p className="text-lg font-bold text-[#D6F04C]">₵{product.price?.toFixed(2) || '0.00'}</p>
+                    <span className={`inline-block px-2 py-0.5 rounded-full text-xs font-medium ${getStockBadge(product.stock).color}`}>
+                      {getStockBadge(product.stock).label} ({product.stock})
+                    </span>
+                  </div>
+                </div>
+
+                <div className="flex items-center justify-end gap-2 mt-3 pt-3 border-t border-gray-100">
+                  <button
+                    onClick={() => setExpandedMobile(expandedMobile === product._id ? null : product._id)}
+                    className="text-xs text-black/50 hover:text-[#D6F04C] transition-colors flex items-center gap-1"
+                  >
+                    <FontAwesomeIcon icon={expandedMobile === product._id ? faChevronUp : faChevronDown} className="text-xs" />
+                    {expandedMobile === product._id ? 'Hide' : 'Details'}
+                  </button>
+                  <button
+                    onClick={() => handleOpenModal(product)}
+                    className="px-3 py-1.5 bg-blue-50 text-blue-500 rounded-lg hover:bg-blue-100 transition-colors text-xs font-medium"
+                  >
+                    <FontAwesomeIcon icon={faEdit} className="mr-1" /> Edit
+                  </button>
+                  <button
+                    onClick={() => handleDelete(product._id)}
+                    className="px-3 py-1.5 bg-red-50 text-red-500 rounded-lg hover:bg-red-100 transition-colors text-xs font-medium"
+                  >
+                    <FontAwesomeIcon icon={faTrash} className="mr-1" /> Delete
+                  </button>
+                </div>
+
+                {/* Expanded Details on Mobile */}
+                {expandedMobile === product._id && (
+                  <div className="mt-3 pt-3 border-t border-gray-100 space-y-2">
+                    <p className="text-sm text-black/60">{product.description || 'No description'}</p>
+                    {product.sizes && product.sizes.length > 0 && (
+                      <div className="flex flex-wrap gap-1">
+                        <span className="text-xs text-black/40">Sizes:</span>
+                        {product.sizes.map((size, i) => (
+                          <span key={i} className="text-xs bg-[#F4F6F2] px-2 py-0.5 rounded-full">{size}</span>
+                        ))}
+                      </div>
+                    )}
+                    {product.colors && product.colors.length > 0 && (
+                      <div className="flex flex-wrap gap-1">
+                        <span className="text-xs text-black/40">Colors:</span>
+                        {product.colors.map((color, i) => (
+                          <span key={i} className="text-xs bg-[#F4F6F2] px-2 py-0.5 rounded-full">{color}</span>
+                        ))}
+                      </div>
+                    )}
+                    <div className="flex flex-wrap gap-1">
+                      <span className="text-xs text-black/40">Images:</span>
+                      <span className="text-xs text-black/60">{product.images?.length || 0} uploaded</span>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          ))
+        ) : (
+          <div className="bg-white rounded-2xl p-8 text-center border border-gray-100/50">
+            <div className="text-4xl mb-3">📦</div>
+            <p className="text-black/50 text-sm">No products found</p>
+            <button
+              onClick={() => handleOpenModal()}
+              className="mt-4 text-[#D6F04C] hover:text-[#C5E043] font-medium text-sm transition-colors"
+            >
+              Add your first product →
+            </button>
+          </div>
+        )}
+      </div>
+
+      {/* Add/Edit Modal - Responsive */}
       {isModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
-          <div className="bg-white rounded-2xl p-6 md:p-8 max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-            <div className="flex items-center justify-between mb-6">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-3 sm:p-4">
+          <div className="bg-white rounded-2xl p-4 sm:p-6 md:p-8 max-w-2xl w-full max-h-[95vh] sm:max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between mb-4 sm:mb-6">
               <div>
-                <h2 className="text-2xl font-bold text-black">
+                <h2 className="text-xl sm:text-2xl font-bold text-black">
                   {editingProduct ? 'Edit Product' : 'Add New Product'}
                 </h2>
-                <p className="text-sm text-black/40 mt-1">
+                <p className="text-xs sm:text-sm text-black/40 mt-0.5 sm:mt-1">
                   {editingProduct ? 'Update product details' : 'Fill in the product details'}
                 </p>
               </div>
               <button
                 onClick={handleCloseModal}
-                className="w-10 h-10 rounded-full hover:bg-gray-100 transition-colors flex items-center justify-center"
+                className="w-8 h-8 sm:w-10 sm:h-10 rounded-full hover:bg-gray-100 transition-colors flex items-center justify-center flex-shrink-0"
               >
-                <FontAwesomeIcon icon={faTimes} className="text-gray-400 text-xl" />
+                <FontAwesomeIcon icon={faTimes} className="text-gray-400 text-lg sm:text-xl" />
               </button>
             </div>
 
-            <form onSubmit={handleSubmit} className="space-y-5">
+            <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-5">
               {/* Product Name */}
               <div>
-                <label className="block text-sm font-medium text-black/70 mb-1.5">
+                <label className="block text-xs sm:text-sm font-medium text-black/70 mb-1.5">
                   Product Name *
                 </label>
                 <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                    <FontAwesomeIcon icon={faTag} className="text-gray-400 text-sm" />
+                  <div className="absolute inset-y-0 left-0 pl-3 sm:pl-4 flex items-center pointer-events-none">
+                    <FontAwesomeIcon icon={faTag} className="text-gray-400 text-xs sm:text-sm" />
                   </div>
                   <input
                     type="text"
                     name="name"
                     value={formData.name}
                     onChange={handleChange}
-                    className="w-full px-4 py-3 pl-11 bg-[#F4F6F2] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#D6F04C]/40 focus:bg-white transition-all duration-300 text-sm border border-transparent focus:border-[#D6F04C] placeholder:text-black/30"
+                    className="w-full px-3 sm:px-4 py-2.5 sm:py-3 pl-9 sm:pl-11 bg-[#F4F6F2] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#D6F04C]/40 focus:bg-white transition-all duration-300 text-sm border border-transparent focus:border-[#D6F04C] placeholder:text-black/30"
                     placeholder="Product name"
                     required
                   />
@@ -427,20 +525,20 @@ const ProductManagement = () => {
               </div>
 
               {/* Category & Price */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-black/70 mb-1.5">
+                  <label className="block text-xs sm:text-sm font-medium text-black/70 mb-1.5">
                     Category *
                   </label>
                   <div className="relative">
-                    <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                      <FontAwesomeIcon icon={faLayerGroup} className="text-gray-400 text-sm" />
+                    <div className="absolute inset-y-0 left-0 pl-3 sm:pl-4 flex items-center pointer-events-none">
+                      <FontAwesomeIcon icon={faLayerGroup} className="text-gray-400 text-xs sm:text-sm" />
                     </div>
                     <select
                       name="category"
                       value={formData.category}
                       onChange={handleChange}
-                      className="w-full px-4 py-3 pl-11 bg-[#F4F6F2] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#D6F04C]/40 focus:bg-white transition-all duration-300 text-sm border border-transparent focus:border-[#D6F04C] appearance-none"
+                      className="w-full px-3 sm:px-4 py-2.5 sm:py-3 pl-9 sm:pl-11 bg-[#F4F6F2] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#D6F04C]/40 focus:bg-white transition-all duration-300 text-sm border border-transparent focus:border-[#D6F04C] appearance-none"
                       required
                     >
                       <option value="dresses">Dresses</option>
@@ -452,12 +550,12 @@ const ProductManagement = () => {
                   </div>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-black/70 mb-1.5">
+                  <label className="block text-xs sm:text-sm font-medium text-black/70 mb-1.5">
                     Price (₵) *
                   </label>
                   <div className="relative">
-                    <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                      <span className="text-gray-400 text-sm font-medium">₵</span>
+                    <div className="absolute inset-y-0 left-0 pl-3 sm:pl-4 flex items-center pointer-events-none">
+                      <span className="text-gray-400 text-xs sm:text-sm font-medium">₵</span>
                     </div>
                     <input
                       type="number"
@@ -466,7 +564,7 @@ const ProductManagement = () => {
                       onChange={handleChange}
                       step="0.01"
                       min="0"
-                      className="w-full px-4 py-3 pl-9 bg-[#F4F6F2] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#D6F04C]/40 focus:bg-white transition-all duration-300 text-sm border border-transparent focus:border-[#D6F04C] placeholder:text-black/30"
+                      className="w-full px-3 sm:px-4 py-2.5 sm:py-3 pl-7 sm:pl-9 bg-[#F4F6F2] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#D6F04C]/40 focus:bg-white transition-all duration-300 text-sm border border-transparent focus:border-[#D6F04C] placeholder:text-black/30"
                       placeholder="0.00"
                       required
                     />
@@ -476,7 +574,7 @@ const ProductManagement = () => {
 
               {/* Description */}
               <div>
-                <label className="block text-sm font-medium text-black/70 mb-1.5">
+                <label className="block text-xs sm:text-sm font-medium text-black/70 mb-1.5">
                   Description *
                 </label>
                 <textarea
@@ -484,37 +582,36 @@ const ProductManagement = () => {
                   value={formData.description}
                   onChange={handleChange}
                   rows="3"
-                  className="w-full px-4 py-3 bg-[#F4F6F2] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#D6F04C]/40 focus:bg-white transition-all duration-300 text-sm border border-transparent focus:border-[#D6F04C] placeholder:text-black/30 resize-none"
+                  className="w-full px-3 sm:px-4 py-2.5 sm:py-3 bg-[#F4F6F2] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#D6F04C]/40 focus:bg-white transition-all duration-300 text-sm border border-transparent focus:border-[#D6F04C] placeholder:text-black/30 resize-none"
                   placeholder="Product description"
                   required
                 />
               </div>
 
-              {/* Image Upload with Dropzone */}
+              {/* Image Upload */}
               <div>
-                <label className="block text-sm font-medium text-black/70 mb-1.5">
-                  <FontAwesomeIcon icon={faImage} className="mr-2 text-[#D6F04C]" />
+                <label className="block text-xs sm:text-sm font-medium text-black/70 mb-1.5">
+                  <FontAwesomeIcon icon={faImage} className="mr-1 sm:mr-2 text-[#D6F04C]" />
                   Product Images * ({formData.images.length}/5)
                 </label>
                 
-                {/* Dropzone Area */}
                 <div
                   {...getRootProps()}
-                  className={`border-2 border-dashed rounded-xl p-6 text-center cursor-pointer transition-all ${
+                  className={`border-2 border-dashed rounded-xl p-4 sm:p-6 text-center cursor-pointer transition-all ${
                     isDragActive
                       ? 'border-[#D6F04C] bg-[#D6F04C]/10'
                       : 'border-gray-300 hover:border-[#D6F04C] hover:bg-[#F4F6F2]'
                   } ${uploading ? 'opacity-50 cursor-not-allowed' : ''}`}
                 >
                   <input {...getInputProps()} />
-                  <div className="flex flex-col items-center gap-2">
+                  <div className="flex flex-col items-center gap-1 sm:gap-2">
                     <FontAwesomeIcon 
                       icon={isDragActive ? faCloudUploadAlt : faUpload} 
-                      className={`text-3xl ${isDragActive ? 'text-[#D6F04C]' : 'text-gray-400'}`} 
+                      className={`text-2xl sm:text-3xl ${isDragActive ? 'text-[#D6F04C]' : 'text-gray-400'}`} 
                     />
                     {uploading ? (
                       <>
-                        <p className="text-sm font-medium text-black/70">Uploading...</p>
+                        <p className="text-xs sm:text-sm font-medium text-black/70">Uploading...</p>
                         <div className="w-full max-w-xs bg-gray-200 rounded-full h-2">
                           <div
                             className="bg-[#D6F04C] h-2 rounded-full transition-all duration-300"
@@ -525,10 +622,10 @@ const ProductManagement = () => {
                       </>
                     ) : (
                       <>
-                        <p className="text-sm font-medium text-black/70">
+                        <p className="text-xs sm:text-sm font-medium text-black/70">
                           {isDragActive ? 'Drop images here' : 'Drag & drop images here'}
                         </p>
-                        <p className="text-xs text-black/40">
+                        <p className="text-[10px] sm:text-xs text-black/40">
                           or click to select files (Max 5, up to 5MB each)
                         </p>
                       </>
@@ -538,7 +635,7 @@ const ProductManagement = () => {
 
                 {/* Image Previews */}
                 {formData.images.length > 0 && (
-                  <div className="grid grid-cols-3 sm:grid-cols-4 gap-3 mt-3">
+                  <div className="grid grid-cols-3 sm:grid-cols-4 gap-2 sm:gap-3 mt-3">
                     {formData.images.map((image, index) => (
                       <div key={index} className="relative group">
                         <img
@@ -552,9 +649,9 @@ const ProductManagement = () => {
                         <button
                           type="button"
                           onClick={() => removeImage(index)}
-                          className="absolute -top-2 -right-2 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center hover:bg-red-600 transition-colors opacity-0 group-hover:opacity-100"
+                          className="absolute -top-1 -right-1 sm:-top-2 sm:-right-2 w-5 h-5 sm:w-6 sm:h-6 bg-red-500 text-white rounded-full flex items-center justify-center hover:bg-red-600 transition-colors opacity-0 group-hover:opacity-100 text-[10px] sm:text-xs"
                         >
-                          <FontAwesomeIcon icon={faTimes} className="text-xs" />
+                          <FontAwesomeIcon icon={faTimes} />
                         </button>
                       </div>
                     ))}
@@ -563,10 +660,10 @@ const ProductManagement = () => {
               </div>
 
               {/* Sizes & Colors */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-black/70 mb-1.5">
-                    <FontAwesomeIcon icon={faRuler} className="mr-2 text-[#D6F04C]" />
+                  <label className="block text-xs sm:text-sm font-medium text-black/70 mb-1.5">
+                    <FontAwesomeIcon icon={faRuler} className="mr-1 sm:mr-2 text-[#D6F04C]" />
                     Sizes (comma separated)
                   </label>
                   <input
@@ -574,12 +671,12 @@ const ProductManagement = () => {
                     value={formData.sizes.join(', ')}
                     onChange={(e) => handleArrayChange('sizes', e.target.value)}
                     placeholder="S, M, L, XL"
-                    className="w-full px-4 py-3 bg-[#F4F6F2] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#D6F04C]/40 focus:bg-white transition-all duration-300 text-sm border border-transparent focus:border-[#D6F04C] placeholder:text-black/30"
+                    className="w-full px-3 sm:px-4 py-2.5 sm:py-3 bg-[#F4F6F2] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#D6F04C]/40 focus:bg-white transition-all duration-300 text-sm border border-transparent focus:border-[#D6F04C] placeholder:text-black/30"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-black/70 mb-1.5">
-                    <FontAwesomeIcon icon={faPalette} className="mr-2 text-[#D6F04C]" />
+                  <label className="block text-xs sm:text-sm font-medium text-black/70 mb-1.5">
+                    <FontAwesomeIcon icon={faPalette} className="mr-1 sm:mr-2 text-[#D6F04C]" />
                     Colors (comma separated)
                   </label>
                   <input
@@ -587,15 +684,15 @@ const ProductManagement = () => {
                     value={formData.colors.join(', ')}
                     onChange={(e) => handleArrayChange('colors', e.target.value)}
                     placeholder="Black, Gold, White"
-                    className="w-full px-4 py-3 bg-[#F4F6F2] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#D6F04C]/40 focus:bg-white transition-all duration-300 text-sm border border-transparent focus:border-[#D6F04C] placeholder:text-black/30"
+                    className="w-full px-3 sm:px-4 py-2.5 sm:py-3 bg-[#F4F6F2] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#D6F04C]/40 focus:bg-white transition-all duration-300 text-sm border border-transparent focus:border-[#D6F04C] placeholder:text-black/30"
                   />
                 </div>
               </div>
 
               {/* Stock */}
               <div>
-                <label className="block text-sm font-medium text-black/70 mb-1.5">
-                  <FontAwesomeIcon icon={faBox} className="mr-2 text-[#D6F04C]" />
+                <label className="block text-xs sm:text-sm font-medium text-black/70 mb-1.5">
+                  <FontAwesomeIcon icon={faBox} className="mr-1 sm:mr-2 text-[#D6F04C]" />
                   Stock *
                 </label>
                 <input
@@ -604,26 +701,26 @@ const ProductManagement = () => {
                   value={formData.stock}
                   onChange={handleChange}
                   min="0"
-                  className="w-full md:w-48 px-4 py-3 bg-[#F4F6F2] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#D6F04C]/40 focus:bg-white transition-all duration-300 text-sm border border-transparent focus:border-[#D6F04C] placeholder:text-black/30"
+                  className="w-full sm:w-48 px-3 sm:px-4 py-2.5 sm:py-3 bg-[#F4F6F2] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#D6F04C]/40 focus:bg-white transition-all duration-300 text-sm border border-transparent focus:border-[#D6F04C] placeholder:text-black/30"
                   placeholder="0"
                   required
                 />
               </div>
 
               {/* Buttons */}
-              <div className="flex flex-col sm:flex-row gap-3 pt-4 border-t border-gray-100">
+              <div className="flex flex-col sm:flex-row gap-3 pt-3 sm:pt-4 border-t border-gray-100">
                 <button
                   type="submit"
                   disabled={uploading || formData.images.length === 0}
-                  className="flex-1 inline-flex items-center justify-center gap-2 bg-black text-white font-semibold px-6 py-3.5 rounded-xl hover:bg-black-800 transition-all duration-300 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="flex-1 inline-flex items-center justify-center gap-2 bg-black text-white font-semibold px-4 sm:px-6 py-3 sm:py-3.5 rounded-xl hover:bg-black-800 transition-all duration-300 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed text-sm sm:text-base"
                 >
-                  <FontAwesomeIcon icon={faSave} className="text-sm" />
+                  <FontAwesomeIcon icon={faSave} className="text-xs sm:text-sm" />
                   {editingProduct ? 'Update Product' : 'Create Product'}
                 </button>
                 <button
                   type="button"
                   onClick={handleCloseModal}
-                  className="px-6 py-3.5 border border-gray-300 rounded-xl hover:bg-gray-50 transition-colors text-sm font-medium text-black/60"
+                  className="px-4 sm:px-6 py-3 sm:py-3.5 border border-gray-300 rounded-xl hover:bg-gray-50 transition-colors text-xs sm:text-sm font-medium text-black/60"
                 >
                   Cancel
                 </button>
