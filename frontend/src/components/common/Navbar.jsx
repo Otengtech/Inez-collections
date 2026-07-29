@@ -111,9 +111,9 @@ const Navbar = () => {
           {/* Logo */}
           <Link to="/" className="flex items-center gap-2 flex-shrink-0">
             <FontAwesomeIcon icon={faCrown} className="text-gold-600 text-xl" />
-            <span className="text-lg font-bold whitespace-nowrap hidden sm:inline">
+            <span className="text-lg font-bold whitespace-nowrap sm:inline">
               <span className="text-black">Inez</span>
-              <span className="gold-text">Collections</span>
+              <span className="text-[#D6F04C]"> Collections</span>
             </span>
           </Link>
 
