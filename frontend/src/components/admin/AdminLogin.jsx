@@ -143,32 +143,6 @@ const AdminLogin = () => {
                 </div>
               </div>
 
-              {/* Demo Credentials */}
-              <div className="bg-gradient-to-br from-[#F4F6F2] to-[#EDF1EC] rounded-xl p-5 border border-white/50 shadow-inner">
-                <div className="flex items-center gap-2 mb-3">
-                  <div className="w-6 h-6 bg-[#D6F04C]/20 rounded-full flex items-center justify-center">
-                    <FontAwesomeIcon icon={faUserShield} className="text-[10px] text-[#D6F04C]" />
-                  </div>
-                  <p className="text-xs font-semibold text-black/50 uppercase tracking-wider">
-                    Demo Credentials
-                  </p>
-                </div>
-                <div className="space-y-1.5 pl-0">
-                  <div className="flex items-center gap-2 text-sm">
-                    <span className="w-16 text-black/40 text-xs">Email</span>
-                    <span className="font-mono text-black/80 font-medium text-sm bg-white/60 px-3 py-1 rounded-lg border border-white/50">
-                      admin@ecommerce.com
-                    </span>
-                  </div>
-                  <div className="flex items-center gap-2 text-sm">
-                    <span className="w-16 text-black/40 text-xs">Password</span>
-                    <span className="font-mono text-black/80 font-medium text-sm bg-white/60 px-3 py-1 rounded-lg border border-white/50">
-                      Admin123!
-                    </span>
-                  </div>
-                </div>
-              </div>
-
               {/* Submit Button */}
               <button
                 type="submit"
