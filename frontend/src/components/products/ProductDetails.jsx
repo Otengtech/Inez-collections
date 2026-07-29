@@ -372,7 +372,7 @@ const ProductDetails = ({ product }) => {
       {/* ============================================ */}
       {/* REVIEWS SECTION */}
       {/* ============================================ */}
-      <div id="reviews" className="mt-8 relative bg-white rounded-[2.5rem] p-4 sm:p-6 md:p-8 lg:p-10 shadow-[0_20px_60px_rgba(0,0,0,0.06)]">
+      <div id="reviews" className="mt-8 relative mb-6 bg-white rounded-[2.5rem] p-4 sm:p-6 md:p-8 lg:p-10 shadow-[0_20px_60px_rgba(0,0,0,0.06)]">
         <svg className="absolute -bottom-10 -left-10 w-72 h-72 opacity-[0.08] pointer-events-none" viewBox="0 0 200 200">
           <circle cx="100" cy="100" r="80" fill="none" stroke="#000" strokeWidth="0.5" />
           <line x1="0" y1="40" x2="200" y2="0" stroke="#000" strokeWidth="0.5" />
@@ -449,7 +449,7 @@ const ProductDetails = ({ product }) => {
               </div>
             ) : (
               <div className="text-center py-12 bg-[#F4F6F2] rounded-2xl">
-                <div className="text-5xl mb-3">📝</div>
+                {/* <div className="text-5xl mb-3">📝</div> */}
                 <h4 className="font-semibold text-black text-lg mb-1">No Reviews Yet</h4>
                 <p className="text-black/50 text-sm mb-4">
                   Be the first to review this product!

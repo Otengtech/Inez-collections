@@ -17,12 +17,25 @@ import Checkout from './pages/Checkout'
 import Category from './pages/Category'
 import OrderSuccess from './pages/OrderSuccess'
 import OrderTracking from './pages/OrderTracking'
+import OrderPage from './pages/OrdersPage' // ✅ Import OrderPage
 import Contact from './pages/Contact'
 import AdminLayout from './components/admin/AdminLayout'
 import Wishlist from './pages/Whishlist'
 import Reviews from './pages/Reviews'
 import About from './pages/About'
 import AdminLogin from './components/admin/AdminLogin'
+
+// Protected Route Component
+const PrivateRoute = ({ children }) => {
+  const { user } = useSelector((state) => state.auth)
+  const location = useLocation()
+  
+  if (!user) {
+    return <Navigate to="/admin-login" state={{ from: location }} replace />
+  }
+  
+  return children
+}
 
 function App() {
   const location = useLocation()
@@ -33,7 +46,7 @@ function App() {
       {/* Toast Notifications */}
       <ToastContainer
         position="top-right"
-        autoClose={3000}
+        autoClose={2000}
         hideProgressBar={false}
         newestOnTop={false}
         closeOnClick
@@ -58,6 +71,7 @@ function App() {
           <Route path="/checkout" element={<Checkout />} />
           <Route path="/order-success" element={<OrderSuccess />} />
           <Route path="/order-tracking/:orderId" element={<OrderTracking />} />
+          <Route path="/orders" element={<OrderPage />} /> {/* ✅ Order Page Route */}
           <Route path="/contact" element={<Contact />} />
           <Route path="/admin-login" element={<AdminLogin />} />
           <Route path="/about" element={<About />} />

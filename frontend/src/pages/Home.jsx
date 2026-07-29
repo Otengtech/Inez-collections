@@ -5,6 +5,7 @@ import HeroSection from '../components/home/HeroSection'
 import CategorySection from '../components/home/CategorySection'
 import FeaturedProducts from '../components/home/FeaturedProducts'
 import NewsletterSection from '../components/home/NewsletterSection'
+import AboutMini from '../components/home/AboutUs'
 
 const Home = () => {
   const dispatch = useDispatch()
@@ -16,6 +17,7 @@ const Home = () => {
   return (
     <div>
       <HeroSection />
+      <AboutMini />
       <CategorySection />
       <FeaturedProducts />
       <NewsletterSection />

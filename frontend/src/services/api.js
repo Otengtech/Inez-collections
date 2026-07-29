@@ -1,3 +1,4 @@
+// api.js
 import axios from 'axios'
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api'
@@ -7,28 +8,34 @@ const api = axios.create({
   headers: {
     'Content-Type': 'application/json',
   },
-  timeout: 30000, // 30 seconds timeout
+  timeout: 30000,
 })
 
 // Request interceptor
 api.interceptors.request.use(
   (config) => {
-    // Get guestId from localStorage
-    const guestId = localStorage.getItem('guestId')
-    if (guestId) {
-      config.headers['X-Guest-ID'] = guestId
-    }
-
-    // Get admin token from localStorage
-    const adminToken = localStorage.getItem('adminToken')
-    if (adminToken) {
-      try {
-        const parsed = JSON.parse(adminToken)
-        if (parsed && parsed._id) {
-          config.headers['X-Admin-ID'] = parsed._id
+    // Check if it's an admin route
+    const isAdminRoute = config.url.includes('/admin/')
+    
+    if (isAdminRoute) {
+      // For admin routes, only send admin token
+      const adminToken = localStorage.getItem('adminToken')
+      if (adminToken) {
+        try {
+          const parsed = JSON.parse(adminToken)
+          if (parsed && parsed._id) {
+            config.headers['X-Admin-ID'] = parsed._id
+          }
+        } catch (e) {
+          // Invalid JSON, ignore
         }
-      } catch (e) {
-        // Invalid JSON, ignore
+      }
+      // Don't send guest ID for admin routes
+    } else {
+      // For non-admin routes, send guest ID
+      const guestId = localStorage.getItem('guestId')
+      if (guestId) {
+        config.headers['X-Guest-ID'] = guestId
       }
     }
 
@@ -46,12 +53,9 @@ api.interceptors.response.use(
   },
   (error) => {
     if (error.response) {
-      // Server responded with error
       const { status, data } = error.response
       
-      // Handle specific status codes
       if (status === 401) {
-        // Unauthorized - clear admin token if present
         localStorage.removeItem('adminToken')
         if (window.location.pathname.startsWith('/admin')) {
           window.location.href = '/admin/login'
@@ -66,21 +70,18 @@ api.interceptors.response.use(
         console.error('Server error:', data)
       }
       
-      // Return error with message
       return Promise.reject({
         status,
         message: data?.message || 'An error occurred',
         data: data,
       })
     } else if (error.request) {
-      // Request made but no response
       console.error('Network Error:', error.request)
       return Promise.reject({
         status: 0,
         message: 'Network error. Please check your connection.',
       })
     } else {
-      // Something else happened
       console.error('Error:', error.message)
       return Promise.reject({
         status: -1,
@@ -90,7 +91,6 @@ api.interceptors.response.use(
   }
 )
 
-// Helper methods
 export const apiService = {
   get: (url, params = {}) => api.get(url, { params }),
   post: (url, data = {}) => api.post(url, data),

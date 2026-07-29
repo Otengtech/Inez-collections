@@ -259,7 +259,7 @@ const Products = () => {
 
           {/* Products Grid */}
           <div className="flex-1 min-w-0 w-full">
-            <ProductGrid products={products} loading={loading} columns={3} />
+            <ProductGrid products={products} loading={loading} columns={4} />
             
             {/* Pagination */}
             {pagination && pagination.pages > 1 && (

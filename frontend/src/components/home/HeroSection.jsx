@@ -10,10 +10,8 @@ import {
   faTshirt,
 } from '@fortawesome/free-solid-svg-icons'
 import {
-  faTwitter,
-  faTiktok,
   faInstagram,
-  faLinkedin
+  faSnapchat
 } from '@fortawesome/free-brands-svg-icons'
 import ScrollReveal from '../common/ScrollReveal'
 import img from '../../assets/img1.jpg'
@@ -79,22 +77,19 @@ const HeroSection = () => {
             <ScrollReveal direction="left">
               <div className="relative bg-white rounded-[2rem] p-6 sm:p-10 h-full min-h-[520px] flex flex-col overflow-hidden">
                 <span className="inline-flex items-center gap-2 w-fit px-4 py-2 bg-[#F4F6F2] rounded-full text-sm font-medium text-black/70 mb-8">
-                  🛍️ Fashion is Timeless
+                  Fashion is Timeless
                 </span>
 
-                <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold leading-[1.05] text-black mb-8 max-w-md relative z-10">
+                <h1 className="text-5xl sm:text-5xl lg:text-6xl font-bold leading-[1.05] text-black mb-8 max-w-md relative z-10">
                   Effortless
                   <br />
                   Everyday Elegance.
                 </h1>
 
                 <div className="flex items-center gap-4 mb-8 relative z-10">
-                  <span className="text-3xl font-light text-black/20">01</span>
-                  <span className="h-px w-14 bg-black/20"></span>
                   <div>
                     <p className="font-semibold text-black text-sm">Premium Fabrics</p>
-                    <p className="text-sm text-black/50 max-w-[15rem]">
-                      Soft, durable materials that hold up to a second look.
+                    <p className="text-sm text-black/50 max-w-[15rem]">With cute dessert charms + a soft shine finish, its meets accessory. We believe every girl deserves to feel glossy and confident
                     </p>
                   </div>
                 </div>
@@ -120,21 +115,38 @@ const HeroSection = () => {
 
                 <div className="flex items-center gap-3 mt-10 relative z-10">
                   <span className="text-sm text-black/50">Follow us on:</span>
-                  {[faTwitter, faTiktok, faInstagram, faLinkedin].map((icon, i) => (
-                    <a
-                      key={i}
-                      href="#"
-                      className="w-8 h-8 rounded-full bg-[#F4F6F2] flex items-center justify-center hover:bg-gold-100 transition-colors"
-                    >
-                      <FontAwesomeIcon icon={icon} className="text-black/60 text-xs" />
-                    </a>
-                  ))}
+                  
+                  {/* Instagram */}
+                  <a
+                    href="https://instagram.com/maame_esi67"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="w-8 h-8 rounded-full bg-[#F4F6F2] flex items-center justify-center hover:bg-[#E4405F] hover:text-white transition-all duration-300 group"
+                  >
+                    <FontAwesomeIcon 
+                      icon={faInstagram} 
+                      className="text-black/60 text-xs group-hover:text-white transition-colors" 
+                    />
+                  </a>
+                  
+                  {/* Snapchat */}
+                  <a
+                    href="https://snapchat.com/add/eee_nez"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="w-8 h-8 rounded-full bg-[#F4F6F2] flex items-center justify-center hover:bg-[#FFFC00] hover:text-black transition-all duration-300 group"
+                  >
+                    <FontAwesomeIcon 
+                      icon={faSnapchat} 
+                      className="text-black/60 text-xs group-hover:text-black transition-colors" 
+                    />
+                  </a>
                 </div>
               </div>
             </ScrollReveal>
 
             {/* Right column */}
-            <div className="flex flex-col gap-5">
+            <div className="flex flex-col-reverse sm:flex-col gap-4 sm:gap-5">
               {/* Popular Categories */}
               <ScrollReveal direction="right" delay={100}>
                 <div className="bg-white rounded-[1.75rem] p-6 shadow-md hover:shadow-xl transition-shadow duration-300">
@@ -225,102 +237,6 @@ const HeroSection = () => {
                 </ScrollReveal>
               </div>
             </div>
-          </div>
-
-          {/* Bottom row */}
-          <div className="relative grid grid-cols-1 md:grid-cols-3 gap-5 mt-5">
-            {/* More Products */}
-            <ScrollReveal direction="up" delay={100}>
-              <div className="bg-white rounded-[1.75rem] p-6 h-full">
-                <div className="flex items-center justify-between mb-6">
-                  <div>
-                    <p className="font-semibold text-black">More Products</p>
-                    <p className="text-sm text-black/50">300+ items</p>
-                  </div>
-                  <span className="w-9 h-9 rounded-full bg-rose-50 flex items-center justify-center">
-                    <FontAwesomeIcon icon={faHeart} className="text-rose-500 text-xs" />
-                  </span>
-                </div>
-                <div className="flex gap-3">
-                  {[
-                    'https://images.unsplash.com/photo-1596993100471-c3905dafa78e?auto=format&fit=crop&w=200&q=80',
-                    'https://images.unsplash.com/photo-1611930022073-b7a4ba5fcccd?auto=format&fit=crop&w=200&q=80',
-                    'https://images.unsplash.com/photo-1560769629-975ec94e6a86?auto=format&fit=crop&w=200&q=80',
-                  ].map((src, i) => (
-                    <img
-                      key={i}
-                      src={src}
-                      alt=""
-                      className="w-16 h-16 rounded-2xl object-cover"
-                    />
-                  ))}
-                </div>
-              </div>
-            </ScrollReveal>
-
-            {/* Stat card */}
-            <ScrollReveal direction="up" delay={200}>
-              <div className="bg-white rounded-[1.75rem] p-6 h-full flex flex-col items-center text-center">
-                <div className="flex -space-x-3 mb-4">
-                  {[
-                    'https://randomuser.me/api/portraits/women/68.jpg',
-                    'https://randomuser.me/api/portraits/men/32.jpg',
-                    'https://randomuser.me/api/portraits/women/44.jpg',
-                  ].map((src, i) => (
-                    <img
-                      key={i}
-                      src={src}
-                      alt=""
-                      className="w-9 h-9 rounded-full border-2 border-white object-cover"
-                    />
-                  ))}
-                </div>
-                <div className="w-28 h-28 rounded-full bg-gold-600 text-white flex flex-col items-center justify-center mb-4">
-                  <span className="text-2xl font-bold leading-none">50K+</span>
-                  <span className="text-[11px] text-white/80 mt-1">Customers</span>
-                </div>
-                <span className="inline-flex items-center gap-1 bg-[#F4F6F2] rounded-full px-3 py-1.5 text-xs font-medium text-black/70">
-                  <FontAwesomeIcon icon={faStar} className="text-gold-500" />
-                  4.9 rating
-                </span>
-              </div>
-            </ScrollReveal>
-
-            {/* New collection */}
-            <ScrollReveal direction="up" delay={300}>
-              <div className="bg-white rounded-[1.75rem] p-6 h-full">
-                <span className="inline-flex items-center gap-1.5 bg-rose-50 text-rose-500 text-xs font-semibold px-3 py-1.5 rounded-full mb-4">
-                  🔥 Popular
-                </span>
-                <p className="font-semibold text-black mb-1">New Collection Released</p>
-                <div className="flex items-center justify-between mt-4">
-                  <div className="flex -space-x-3">
-                    {[
-                      'https://randomuser.me/api/portraits/women/12.jpg',
-                      'https://randomuser.me/api/portraits/men/45.jpg',
-                    ].map((src, i) => (
-                      <img
-                        key={i}
-                        src={src}
-                        alt=""
-                        className="w-8 h-8 rounded-full border-2 border-white object-cover"
-                      />
-                    ))}
-                  </div>
-                  <div className="relative">
-                    <img
-                      src="https://images.unsplash.com/photo-1483985988355-763728e1935b?auto=format&fit=crop&w=200&q=80"
-                      alt=""
-                      className="w-16 h-16 rounded-2xl object-cover"
-                    />
-                    <span className="absolute -bottom-2 -left-2 bg-white shadow rounded-full px-2 py-0.5 text-[10px] font-bold flex items-center gap-1">
-                      <FontAwesomeIcon icon={faStar} className="text-gold-500 text-[9px]" />
-                      4.8
-                    </span>
-                  </div>
-                </div>
-              </div>
-            </ScrollReveal>
           </div>
         </div>
       </div>

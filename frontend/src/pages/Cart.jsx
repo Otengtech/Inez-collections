@@ -29,8 +29,8 @@ const Cart = () => {
           <p className="text-gray-500 mb-8 max-w-sm mx-auto">
             Looks like you haven't added any items to your cart yet. Start shopping to fill it up!
           </p>
-          <Link 
-            to="/products" 
+          <Link
+            to="/products"
             className="inline-flex items-center gap-2 bg-[#D6F04C] text-black px-6 md:px-8 py-3 md:py-4 rounded-full font-semibold hover:bg-[#C5E043] transition-all transform hover:-translate-y-0.5 shadow-lg hover:shadow-xl"
           >
             <FontAwesomeIcon icon={faShoppingCart} />
@@ -42,8 +42,8 @@ const Cart = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 pt-20">
-      <div className="container-custom px-6 sm:px-8 lg:px-10">
+    <div className="min-h-screen bg-gray-50 pt-28">
+      <div className="container-custom px-6 sm:px-8 lg:px-16">
         {/* Header */}
         <ScrollReveal direction="up">
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6 md:mb-8">
@@ -62,7 +62,7 @@ const Cart = () => {
                 {totalItems} item{totalItems > 1 ? 's' : ''} in your cart
               </p>
             </div>
-            
+
             <button
               onClick={handleClearCart}
               className="flex items-center gap-2 px-4 py-2 text-red-500 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all text-sm font-medium"
@@ -78,26 +78,26 @@ const Cart = () => {
           {/* Left Column - Scrollable Cart Items */}
           <div className="flex-1 min-w-0 w-full lg:max-h-[calc(100vh-200px)] lg:overflow-y-auto lg:pr-2 space-y-4">
             {/* Free Shipping Banner */}
-            {totalPrice < 100 && totalPrice > 0 && (
+            {/* {totalPrice < 100 && totalPrice > 0 && (
               <div className="bg-blue-50 border border-blue-200 rounded-2xl p-4 text-center">
                 <p className="text-blue-700 text-sm">
                   🚚 Spend ${(100 - totalPrice).toFixed(2)} more for free shipping!
                 </p>
                 <div className="w-full bg-blue-200 rounded-full h-2 mt-2 max-w-md mx-auto">
-                  <div 
+                  <div
                     className="bg-blue-600 rounded-full h-2 transition-all duration-500"
                     style={{ width: `${Math.min((totalPrice / 100) * 100, 100)}%` }}
                   ></div>
                 </div>
               </div>
-            )}
+            )} */}
 
             {/* Cart Items */}
             {items.map((item, index) => (
               <ScrollReveal
-                key={`${item.productId}-${item.size}-${item.color}`}
+                key={`${item.productId}-${item.size}-${item.color}-${items.length}`}
                 direction="up"
-                delay={index * 100}
+                delay={(index % 4) * 100}
               >
                 <CartItem item={item} />
               </ScrollReveal>

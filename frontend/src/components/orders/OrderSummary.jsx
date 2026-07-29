@@ -45,13 +45,6 @@ const OrderSummary = ({ items, totalPrice }) => {
           </span>
           <span className="font-semibold text-green-500">Free</span>
         </div>
-        <div className="flex justify-between items-center">
-          <span className="text-black/60 text-sm flex items-center gap-1.5">
-            <FontAwesomeIcon icon={faCreditCard} className="text-xs text-gold-600" />
-            Payment
-          </span>
-          <span className="text-sm text-black/50">Card</span>
-        </div>
         <div className="border-t border-gray-200 pt-3">
           <div className="flex justify-between items-center">
             <span className="text-lg font-bold text-black">Total</span>

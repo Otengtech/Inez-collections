@@ -39,7 +39,7 @@ const OrderTracking = () => {
 
   if (!currentOrder) {
     return (
-      <div className="container-custom py-20 text-center">
+      <div className="container-custom py-28 text-center">
         <p className="text-black-600">Order not found</p>
         <Link to="/products" className="btn-gold inline-block mt-4">
           Browse Products
@@ -51,7 +51,7 @@ const OrderTracking = () => {
   const steps = getStatusSteps()
 
   return (
-    <div className="section-padding mt-20">
+    <div className="section-padding mt-28">
       <div className="container-custom max-w-3xl mx-auto">
         <ScrollReveal direction="up">
           <Link

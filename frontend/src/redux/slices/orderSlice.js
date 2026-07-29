@@ -18,6 +18,14 @@ export const fetchOrderById = createAsyncThunk(
   }
 )
 
+export const fetchUserOrders = createAsyncThunk(
+  'orders/fetchUserOrders',
+  async ({ page = 1, limit = 10 } = {}) => {
+    const response = await api.get(`/orders/user?page=${page}&limit=${limit}`)
+    return response.data
+  }
+)
+
 export const fetchGuestOrders = createAsyncThunk(
   'orders/fetchGuestOrders',
   async ({ guestId, page = 1, limit = 10 }) => {
@@ -92,6 +100,7 @@ const orderSlice = createSlice({
         state.error = action.error.message
         toast.error(action.error.message || 'Failed to place order')
       })
+      
       // Fetch Order By ID
       .addCase(fetchOrderById.pending, (state) => {
         state.loading = true
@@ -106,6 +115,23 @@ const orderSlice = createSlice({
         state.error = action.error.message
         toast.error('Order not found')
       })
+      
+      // Fetch User Orders (Logged-in User)
+      .addCase(fetchUserOrders.pending, (state) => {
+        state.loading = true
+        state.error = null
+      })
+      .addCase(fetchUserOrders.fulfilled, (state, action) => {
+        state.loading = false
+        state.orders = action.payload.orders
+        state.pagination = action.payload.pagination
+      })
+      .addCase(fetchUserOrders.rejected, (state, action) => {
+        state.loading = false
+        state.error = action.error.message
+        toast.error(action.error.message || 'Failed to fetch orders')
+      })
+      
       // Fetch Guest Orders
       .addCase(fetchGuestOrders.pending, (state) => {
         state.loading = true
@@ -120,6 +146,7 @@ const orderSlice = createSlice({
         state.loading = false
         state.error = action.error.message
       })
+      
       // Cancel Order
       .addCase(cancelOrder.pending, (state) => {
         state.loading = true
@@ -139,8 +166,13 @@ const orderSlice = createSlice({
         state.loading = false
         toast.error(action.error.message || 'Failed to cancel order')
       })
+      
       // Update Order Status
+      .addCase(updateOrderStatus.pending, (state) => {
+        state.loading = true
+      })
       .addCase(updateOrderStatus.fulfilled, (state, action) => {
+        state.loading = false
         const index = state.orders.findIndex(o => o._id === action.payload.order._id)
         if (index !== -1) {
           state.orders[index] = action.payload.order
@@ -150,12 +182,25 @@ const orderSlice = createSlice({
         }
         toast.success('Order status updated')
       })
+      .addCase(updateOrderStatus.rejected, (state, action) => {
+        state.loading = false
+        toast.error(action.error.message || 'Failed to update order status')
+      })
+      
       // Update Payment Status
+      .addCase(updatePaymentStatus.pending, (state) => {
+        state.loading = true
+      })
       .addCase(updatePaymentStatus.fulfilled, (state, action) => {
+        state.loading = false
         if (state.currentOrder && state.currentOrder._id === action.payload.order._id) {
           state.currentOrder = action.payload.order
         }
         toast.success('Payment status updated')
+      })
+      .addCase(updatePaymentStatus.rejected, (state, action) => {
+        state.loading = false
+        toast.error(action.error.message || 'Failed to update payment status')
       })
   },
 })

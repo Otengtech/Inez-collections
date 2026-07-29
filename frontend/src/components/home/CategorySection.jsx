@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import {
@@ -11,6 +11,7 @@ import {
   faStar,
 } from '@fortawesome/free-solid-svg-icons'
 import ScrollReveal from '../common/ScrollReveal'
+import api from '../../services/api'
 import img from "../../assets/img4.jpg"
 
 const ArrowUpRight = ({ className = '' }) => (
@@ -18,13 +19,97 @@ const ArrowUpRight = ({ className = '' }) => (
 )
 
 const CategorySection = () => {
+  const [categoryCounts, setCategoryCounts] = useState({})
+  const [loading, setLoading] = useState(true)
+
   const categories = [
-    { name: 'Dresses', slug: 'dresses', icon: faTshirt, color: '#D6F04C', items: '120+' },
-    { name: 'Wigs', slug: 'wigs', icon: faCrown, color: '#D6F04C', items: '85+' },
-    { name: 'Lip Gloss', slug: 'lip-gloss', icon: faPaintRoller, color: '#D6F04C', items: '45+' },
-    { name: 'Sandals', slug: 'sandals', icon: faShoePrints, color: '#D6F04C', items: '60+' },
-    { name: 'Slippers', slug: 'slippers', icon: faSocks, color: '#D6F04C', items: '40+' },
+    { 
+      name: 'Dresses', 
+      slug: 'dresses', 
+      icon: faTshirt, 
+      color: '#C77DFF',
+      iconColor: '#FFFFFF',
+      items: '0' 
+    },
+    { 
+      name: 'Wigs', 
+      slug: 'wigs', 
+      icon: faCrown, 
+      color: '#F4A261',
+      iconColor: '#FFFFFF',
+      items: '0' 
+    },
+    { 
+      name: 'Lip Gloss', 
+      slug: 'lip-gloss', 
+      icon: faPaintRoller, 
+      color: '#E63946',
+      iconColor: '#FFFFFF',
+      items: '0' 
+    },
+    { 
+      name: 'Sandals', 
+      slug: 'sandals', 
+      icon: faShoePrints, 
+      color: '#2A9D8F',
+      iconColor: '#FFFFFF',
+      items: '0' 
+    },
+    { 
+      name: 'Slippers', 
+      slug: 'slippers', 
+      icon: faSocks, 
+      color: '#457B9D',
+      iconColor: '#FFFFFF',
+      items: '0' 
+    },
   ]
+
+  // Fetch product counts for each category
+  useEffect(() => {
+    const fetchCategoryCounts = async () => {
+      try {
+        setLoading(true)
+        const counts = {}
+        
+        // Fetch all products to count by category
+        const response = await api.get('/products', { 
+          params: { limit: 100 } // Get enough products to count
+        })
+        
+        if (response.data.success) {
+          const products = response.data.products || []
+          
+          // Count products by category
+          categories.forEach(cat => {
+            const count = products.filter(p => p.category === cat.slug).length
+            counts[cat.slug] = count
+          })
+          
+          setCategoryCounts(counts)
+        }
+      } catch (error) {
+        console.error('Error fetching category counts:', error)
+        // Fallback: set default counts
+        categories.forEach(cat => {
+          setCategoryCounts(prev => ({
+            ...prev,
+            [cat.slug]: 0
+          }))
+        })
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchCategoryCounts()
+  }, [])
+
+  // Update categories with real counts
+  const updatedCategories = categories.map(cat => ({
+    ...cat,
+    items: categoryCounts[cat.slug] !== undefined ? `${categoryCounts[cat.slug]}+` : '0'
+  }))
 
   return (
     <section className="relative px-4 sm:px-6 lg:px-10 py-6">
@@ -43,7 +128,7 @@ const CategorySection = () => {
           </div>
         </ScrollReveal>
 
-        {/* Featured Image + Categories */}
+        {/* Featured Image + Categories - Keeping original layout */}
         <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
           {/* Featured Image - Takes 2 columns */}
           <div className="lg:col-span-2">
@@ -68,28 +153,31 @@ const CategorySection = () => {
             </div>
           </div>
 
-          {/* Categories Grid - Takes 3 columns */}
+          {/* Categories Grid - Takes 3 columns - Updated with HeroSection functionality */}
           <div className="lg:col-span-3">
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 h-full">
-              {categories.map((category, index) => (
+              {updatedCategories.map((category, index) => (
                 <ScrollReveal key={category.name} direction="up" delay={index * 100}>
                   <Link
-                    to={`/products?category=${category.slug}`}
+                    to={`/category/${category.slug}`}
                     className="group relative bg-transparent rounded-2xl p-4 md:p-5 text-center hover:scale-105 transition-all duration-300 flex flex-col items-center justify-center h-full"
                   >
                     <div
-                      className="w-16 h-16 bg-gray-700 md:w-20 md:h-20 rounded-full flex items-center justify-center mb-3 transition-all duration-300 group-hover:shadow-lg"
+                      className="w-16 h-16 md:w-20 md:h-20 rounded-full flex items-center justify-center mb-3 transition-all duration-300 group-hover:shadow-lg group-hover:scale-110"
+                      style={{ backgroundColor: category.color }}
                     >
                       <FontAwesomeIcon
                         icon={category.icon}
-                        className="text-2xl md:text-3xl transition-all duration-300 group-hover:scale-110"
-                        style={{ color: category.color }}
+                        className="text-2xl md:text-3xl transition-all duration-300"
+                        style={{ color: category.iconColor }}
                       />
                     </div>
                     <h3 className="font-medium text-sm md:text-base text-black/80">
                       {category.name}
                     </h3>
-                    <p className="text-xs text-black/30 mt-1">{category.items} items</p>
+                    <p className="text-xs text-black/30 mt-1">
+                      {loading ? '...' : `${category.items} items`}
+                    </p>
                   </Link>
                 </ScrollReveal>
               ))}

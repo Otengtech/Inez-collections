@@ -1,8 +1,7 @@
-import React, { useEffect } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
+import React, { useState, useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import {
-  faChartLine,
   faBox,
   faShoppingBag,
   faUsers,
@@ -14,18 +13,134 @@ import {
   faCheckCircle,
   faTimesCircle,
   faArrowRight,
+  faRefresh,
 } from '@fortawesome/free-solid-svg-icons'
-import { fetchAdminStats } from '../../redux/slices/adminSlice'
-import Loader from '../common/Loader'
+import { toast } from 'react-toastify'
+import api from '../../services/api'
 import ScrollReveal from '../common/ScrollReveal'
 
 const Dashboard = () => {
-  const dispatch = useDispatch()
-  const { stats, loading } = useSelector((state) => state.admin)
+  const navigate = useNavigate()
+  const [loading, setLoading] = useState(true)
+  const [refreshing, setRefreshing] = useState(false)
+  const [lastUpdated, setLastUpdated] = useState(new Date())
+  const [orders, setOrders] = useState([])
+  const [stats, setStats] = useState({
+    totalOrders: 0,
+    pending: 0,
+    processing: 0,
+    shipped: 0,
+    delivered: 0,
+    cancelled: 0,
+    totalRevenue: 0,
+  })
+  const [paymentStats, setPaymentStats] = useState({
+    pending: 0,
+    completed: 0,
+    failed: 0,
+  })
+  const [recentOrders, setRecentOrders] = useState([])
+
+  // Fetch orders and stats from backend
+  const fetchData = async () => {
+    setRefreshing(true)
+    try {
+      // Fetch all orders
+      const ordersResponse = await api.get('/orders/admin/all')
+      const ordersData = ordersResponse.data.orders || []
+      setOrders(ordersData)
+      
+      // Calculate stats from orders
+      calculateStats(ordersData)
+      
+      // Get recent orders (last 5)
+      setRecentOrders(ordersData.slice(0, 5))
+      
+      setLastUpdated(new Date())
+    } catch (error) {
+      console.error('Failed to fetch data:', error)
+      toast.error('Failed to fetch dashboard data')
+    } finally {
+      setRefreshing(false)
+      setLoading(false)
+    }
+  }
+
+  // Calculate all stats from orders data (same logic as AdminDashboard)
+  const calculateStats = (ordersData) => {
+    if (!ordersData || ordersData.length === 0) {
+      setStats({
+        totalOrders: 0,
+        pending: 0,
+        processing: 0,
+        shipped: 0,
+        delivered: 0,
+        cancelled: 0,
+        totalRevenue: 0,
+      })
+      setPaymentStats({
+        pending: 0,
+        completed: 0,
+        failed: 0,
+      })
+      return
+    }
+
+    // Order status counts
+    const totalOrders = ordersData.length
+    const pending = ordersData.filter(o => o.status === 'pending').length
+    const processing = ordersData.filter(o => o.status === 'processing').length
+    const shipped = ordersData.filter(o => o.status === 'shipped').length
+    const delivered = ordersData.filter(o => o.status === 'delivered').length
+    const cancelled = ordersData.filter(o => o.status === 'cancelled').length
+    
+    // Payment status counts
+    const paymentPending = ordersData.filter(o => o.paymentStatus === 'pending').length
+    const paymentCompleted = ordersData.filter(o => o.paymentStatus === 'completed').length
+    const paymentFailed = ordersData.filter(o => o.paymentStatus === 'failed').length
+    
+    // Calculate revenue from completed payments (non-cancelled)
+    const totalRevenue = ordersData
+      .filter(o => o.paymentStatus === 'completed' && o.status !== 'cancelled')
+      .reduce((sum, o) => sum + (o.totalAmount || 0), 0)
+
+    setStats({
+      totalOrders,
+      pending,
+      processing,
+      shipped,
+      delivered,
+      cancelled,
+      totalRevenue,
+    })
+    
+    setPaymentStats({
+      pending: paymentPending,
+      completed: paymentCompleted,
+      failed: paymentFailed,
+    })
+  }
 
   useEffect(() => {
-    dispatch(fetchAdminStats())
-  }, [dispatch])
+    fetchData()
+    
+    // Poll for updates every 30 seconds
+    const interval = setInterval(fetchData, 30000)
+
+    return () => clearInterval(interval)
+  }, [])
+
+  // Get status color for badges
+  const getStatusColor = (status) => {
+    const colors = {
+      pending: 'bg-yellow-100 text-yellow-600',
+      processing: 'bg-blue-100 text-blue-600',
+      shipped: 'bg-purple-100 text-purple-600',
+      delivered: 'bg-green-100 text-green-600',
+      cancelled: 'bg-red-100 text-red-600',
+    }
+    return colors[status] || 'bg-gray-100 text-gray-600'
+  }
 
   if (loading) {
     return (
@@ -41,35 +156,34 @@ const Dashboard = () => {
   const statCards = [
     {
       label: 'Total Revenue',
-      value: `$${stats?.totalRevenue?.toFixed(2) || '0.00'}`,
+      value: `₵${(stats.totalRevenue || 0).toFixed(2)}`,
       icon: faDollarSign,
       color: 'from-green-400 to-green-600',
       bg: 'bg-green-50',
     },
     {
       label: 'Total Orders',
-      value: stats?.totalOrders || 0,
+      value: stats.totalOrders || 0,
       icon: faShoppingBag,
       color: 'from-blue-400 to-blue-600',
       bg: 'bg-blue-50',
     },
     {
-      label: 'Total Products',
-      value: stats?.totalProducts || 0,
-      icon: faBox,
-      color: 'from-purple-400 to-purple-600',
-      bg: 'bg-purple-50',
+      label: 'Pending Orders',
+      value: stats.pending || 0,
+      icon: faClock,
+      color: 'from-yellow-400 to-yellow-600',
+      bg: 'bg-yellow-50',
     },
     {
-      label: 'Subscribers',
-      value: stats?.totalSubscribers || 0,
-      icon: faUsers,
-      color: 'from-pink-400 to-pink-600',
-      bg: 'bg-pink-50',
+      label: 'Delivered',
+      value: stats.delivered || 0,
+      icon: faCheckCircle,
+      color: 'from-green-400 to-green-600',
+      bg: 'bg-green-50',
     },
   ]
 
-  const statusStats = stats?.ordersByStatus || {}
   const statusItems = [
     { key: 'pending', label: 'Pending', icon: faClock, color: 'text-yellow-600', bg: 'bg-yellow-50' },
     { key: 'processing', label: 'Processing', icon: faBoxOpen, color: 'text-blue-600', bg: 'bg-blue-50' },
@@ -77,6 +191,14 @@ const Dashboard = () => {
     { key: 'delivered', label: 'Delivered', icon: faCheckCircle, color: 'text-green-600', bg: 'bg-green-50' },
     { key: 'cancelled', label: 'Cancelled', icon: faTimesCircle, color: 'text-red-600', bg: 'bg-red-50' },
   ]
+
+  const statusMap = {
+    pending: stats.pending || 0,
+    processing: stats.processing || 0,
+    shipped: stats.shipped || 0,
+    delivered: stats.delivered || 0,
+    cancelled: stats.cancelled || 0,
+  }
 
   return (
     <div>
@@ -86,9 +208,19 @@ const Dashboard = () => {
           <h1 className="text-2xl md:text-3xl font-bold text-black">Dashboard</h1>
           <p className="text-sm text-black/40 mt-1">Overview of your store performance</p>
         </div>
-        <span className="text-xs text-black/30 bg-white px-4 py-2 rounded-full shadow-sm">
-          Last updated: {new Date().toLocaleDateString()}
-        </span>
+        <div className="flex items-center gap-3">
+          <span className="text-xs text-black/30 bg-white px-4 py-2 rounded-full shadow-sm">
+            Last updated: {lastUpdated.toLocaleString()}
+          </span>
+          <button
+            onClick={fetchData}
+            disabled={refreshing}
+            className="flex items-center gap-2 px-4 py-2 bg-[#D6F04C] text-black rounded-full text-sm font-medium hover:bg-[#C5E043] transition-all hover:scale-105 disabled:opacity-50"
+          >
+            <FontAwesomeIcon icon={faRefresh} className={`text-sm ${refreshing ? 'animate-spin' : ''}`} />
+            Refresh
+          </button>
+        </div>
       </div>
 
       {/* Stats Grid */}
@@ -119,31 +251,32 @@ const Dashboard = () => {
               Order Status Distribution
             </h3>
             <div className="space-y-3">
-              {statusItems.map((item) => (
-                <div key={item.key} className="flex items-center justify-between group">
-                  <div className="flex items-center gap-3">
-                    <div className={`${item.bg} p-2 rounded-lg group-hover:scale-110 transition-transform`}>
-                      <FontAwesomeIcon icon={item.icon} className={item.color} />
+              {statusItems.map((item) => {
+                const count = statusMap[item.key] || 0
+                const totalOrders = stats.totalOrders || 0
+                const percentage = totalOrders > 0 ? (count / totalOrders) * 100 : 0
+                return (
+                  <div key={item.key} className="flex items-center justify-between group">
+                    <div className="flex items-center gap-3">
+                      <div className={`${item.bg} p-2 rounded-lg group-hover:scale-110 transition-transform`}>
+                        <FontAwesomeIcon icon={item.icon} className={item.color} />
+                      </div>
+                      <span className="text-black/70 text-sm">{item.label}</span>
                     </div>
-                    <span className="text-black/70 text-sm">{item.label}</span>
-                  </div>
-                  <div className="flex items-center gap-4">
-                    <div className="w-32 h-2 bg-gray-200 rounded-full overflow-hidden">
-                      <div
-                        className="h-full gold-gradient rounded-full transition-all duration-1000 ease-out"
-                        style={{
-                          width: `${stats?.totalOrders > 0 
-                            ? ((statusStats[item.key] || 0) / stats.totalOrders) * 100 
-                            : 0}%`
-                        }}
-                      />
+                    <div className="flex items-center gap-4">
+                      <div className="w-32 h-2 bg-gray-200 rounded-full overflow-hidden">
+                        <div
+                          className="h-full bg-[#D6F04C] rounded-full transition-all duration-1000 ease-out"
+                          style={{ width: `${percentage}%` }}
+                        />
+                      </div>
+                      <span className="text-sm font-semibold text-black/70 w-10 text-right">
+                        {count}
+                      </span>
                     </div>
-                    <span className="text-sm font-semibold text-black/70 w-10 text-right">
-                      {statusStats[item.key] || 0}
-                    </span>
                   </div>
-                </div>
-              ))}
+                )
+              })}
             </div>
           </div>
         </ScrollReveal>
@@ -157,7 +290,7 @@ const Dashboard = () => {
                 Recent Orders
               </h3>
               <button
-                onClick={() => setActivePage('orders')}
+                onClick={() => navigate('/admin/orders')}
                 className="text-sm text-[#D6F04C] hover:text-[#C5E043] transition-colors flex items-center gap-1 font-medium"
               >
                 View All
@@ -165,34 +298,41 @@ const Dashboard = () => {
               </button>
             </div>
             
-            {stats?.recentOrders?.length > 0 ? (
+            {recentOrders.length > 0 ? (
               <div className="space-y-3">
-                {stats.recentOrders.slice(0, 5).map((order) => (
-                  <div
-                    key={order._id}
-                    className="flex items-center justify-between p-3 bg-[#F4F6F2] rounded-xl hover:bg-[#EDF1EC] transition-colors"
-                  >
-                    <div>
-                      <p className="font-medium text-sm text-black">{order.shippingAddress?.fullName || 'Guest'}</p>
-                      <p className="text-xs text-black/50">
-                        ${order.totalAmount?.toFixed(2) || '0.00'}
-                      </p>
+                {recentOrders.slice(0, 5).map((order) => {
+                  const statusColors = {
+                    delivered: 'bg-green-100 text-green-600',
+                    pending: 'bg-yellow-100 text-yellow-600',
+                    cancelled: 'bg-red-100 text-red-600',
+                    processing: 'bg-blue-100 text-blue-600',
+                    shipped: 'bg-purple-100 text-purple-600',
+                  }
+                  return (
+                    <div
+                      key={order._id}
+                      className="flex items-center justify-between p-3 bg-[#F4F6F2] rounded-xl hover:bg-[#EDF1EC] transition-colors cursor-pointer"
+                      onClick={() => navigate('/admin/orders')}
+                    >
+                      <div>
+                        <p className="font-medium text-sm text-black">
+                          {order.shippingAddress?.fullName || 'Guest'}
+                        </p>
+                        <p className="text-xs text-black/50">
+                          ₵{order.totalAmount?.toFixed(2) || '0.00'}
+                        </p>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <span className={`px-2 py-1 rounded-full text-xs font-semibold ${statusColors[order.status] || 'bg-gray-100 text-gray-600'}`}>
+                          {order.status || 'pending'}
+                        </span>
+                        <span className="text-xs text-black/40">
+                          {new Date(order.createdAt).toLocaleDateString()}
+                        </span>
+                      </div>
                     </div>
-                    <div className="flex items-center gap-3">
-                      <span className={`px-2 py-1 rounded-full text-xs font-semibold ${
-                        order.status === 'delivered' ? 'bg-green-100 text-green-600' :
-                        order.status === 'pending' ? 'bg-yellow-100 text-yellow-600' :
-                        order.status === 'cancelled' ? 'bg-red-100 text-red-600' :
-                        'bg-blue-100 text-blue-600'
-                      }`}>
-                        {order.status}
-                      </span>
-                      <span className="text-xs text-black/40">
-                        {new Date(order.createdAt).toLocaleDateString()}
-                      </span>
-                    </div>
-                  </div>
-                ))}
+                  )
+                })}
               </div>
             ) : (
               <div className="text-center py-12">
@@ -203,61 +343,6 @@ const Dashboard = () => {
           </div>
         </ScrollReveal>
       </div>
-
-      {/* Quick Actions */}
-      <ScrollReveal direction="up" delay={300}>
-        <div className="mt-6 bg-white rounded-xl p-6 shadow-sm hover:shadow-md transition-all duration-300">
-          <h3 className="font-semibold text-lg text-black mb-4 flex items-center gap-2">
-            <span className="w-1 h-6 bg-[#D6F04C] rounded-full"></span>
-            Quick Actions
-          </h3>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <button
-              onClick={() => setActivePage('products')}
-              className="p-4 bg-[#F4F6F2] rounded-xl hover:bg-[#EDF1EC] transition-all text-center group"
-            >
-              <div className="w-12 h-12 bg-[#D6F04C]/20 rounded-xl flex items-center justify-center mx-auto mb-2 group-hover:bg-[#D6F04C]/30 transition-colors group-hover:scale-110">
-                <FontAwesomeIcon icon={faBox} className="text-[#D6F04C] text-xl" />
-              </div>
-              <p className="text-sm font-medium text-black/70">Add Product</p>
-            </button>
-            <button
-              onClick={() => setActivePage('orders')}
-              className="p-4 bg-[#F4F6F2] rounded-xl hover:bg-[#EDF1EC] transition-all text-center group"
-            >
-              <div className="w-12 h-12 bg-[#D6F04C]/20 rounded-xl flex items-center justify-center mx-auto mb-2 group-hover:bg-[#D6F04C]/30 transition-colors group-hover:scale-110">
-                <FontAwesomeIcon icon={faShoppingBag} className="text-[#D6F04C] text-xl" />
-              </div>
-              <p className="text-sm font-medium text-black/70">View Orders</p>
-            </button>
-            <button
-              onClick={() => setActivePage('contacts')}
-              className="p-4 bg-[#F4F6F2] rounded-xl hover:bg-[#EDF1EC] transition-all text-center group"
-            >
-              <div className="w-12 h-12 bg-[#D6F04C]/20 rounded-xl flex items-center justify-center mx-auto mb-2 group-hover:bg-[#D6F04C]/30 transition-colors group-hover:scale-110">
-                <FontAwesomeIcon icon={faEnvelope} className="text-[#D6F04C] text-xl" />
-              </div>
-              <p className="text-sm font-medium text-black/70">
-                Messages
-                {stats?.newContacts > 0 && (
-                  <span className="ml-1 text-xs text-red-500 font-bold">
-                    ({stats.newContacts})
-                  </span>
-                )}
-              </p>
-            </button>
-            <button
-              onClick={() => setActivePage('subscribers')}
-              className="p-4 bg-[#F4F6F2] rounded-xl hover:bg-[#EDF1EC] transition-all text-center group"
-            >
-              <div className="w-12 h-12 bg-[#D6F04C]/20 rounded-xl flex items-center justify-center mx-auto mb-2 group-hover:bg-[#D6F04C]/30 transition-colors group-hover:scale-110">
-                <FontAwesomeIcon icon={faUsers} className="text-[#D6F04C] text-xl" />
-              </div>
-              <p className="text-sm font-medium text-black/70">Newsletter</p>
-            </button>
-          </div>
-        </div>
-      </ScrollReveal>
     </div>
   )
 }

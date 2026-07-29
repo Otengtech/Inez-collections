@@ -7,8 +7,13 @@ import {
   faMapMarkerAlt,
   faArrowRight,
   faClock,
-  faPaperPlane,
+  faPaperPlane
 } from '@fortawesome/free-solid-svg-icons'
+import {
+  faInstagram,
+  faSnapchat,
+  faWhatsapp, // ✅ This is in brands package
+} from '@fortawesome/free-brands-svg-icons'
 import ScrollReveal from '../components/common/ScrollReveal'
 import api from '../services/api'
 
@@ -56,26 +61,38 @@ const Contact = () => {
     {
       icon: faEnvelope,
       title: 'Email Us',
-      details: 'info@inezcollections.com',
+      details: 'emaame371@gmail.com',
       description: "We'll respond within 24 hours",
       color: '#457B9D',
       bgColor: '#457B9D1A',
+      link: 'mailto:emaame371@gmail.com',
     },
     {
       icon: faPhone,
       title: 'Call Us',
-      details: '+1 (555) 123-4567',
-      description: 'Mon-Fri 9am - 6pm EST',
+      details: '050967170 / 0551390411',
+      description: 'Mon-Fri 9am - 6pm',
       color: '#2A9D8F',
       bgColor: '#2A9D8F1A',
+      link: 'tel:050967170',
+    },
+    {
+      icon: faWhatsapp,
+      title: 'WhatsApp',
+      details: '0243903661',
+      description: 'Click to chat with us',
+      color: '#25D366',
+      bgColor: '#25D3661A',
+      link: 'https://wa.me/0243903661',
     },
     {
       icon: faMapMarkerAlt,
       title: 'Visit Us',
-      details: '123 Fashion Avenue',
-      description: 'New York, NY 10001',
+      details: 'Accra, Koforidua',
+      description: 'Pickup/Delivery Available',
       color: '#E63946',
       bgColor: '#E639461A',
+      link: null,
     },
   ]
 
@@ -83,19 +100,12 @@ const Contact = () => {
     <section className="relative pt-28 pb-10 px-4 sm:px-6 lg:px-10">
       <div className="max-w-7xl mx-auto">
         <div className="relative rounded-[2.5rem] bg-[#EDF1EC] p-4 sm:p-6 md:p-8 lg:p-10 shadow-[0_20px_60px_rgba(0,0,0,0.06)] overflow-hidden">
-          {/* Decorative elements */}
-          <svg className="absolute -top-10 -right-10 w-72 h-72 opacity-[0.15] pointer-events-none" viewBox="0 0 200 200">
-            <circle cx="100" cy="100" r="80" fill="none" stroke="#000" strokeWidth="0.5" />
-            <line x1="0" y1="40" x2="200" y2="0" stroke="#000" strokeWidth="0.5" />
-          </svg>
-          <div className="absolute top-20 left-10 w-32 h-32 bg-gold-400/5 rounded-full blur-3xl"></div>
-          <div className="absolute bottom-20 right-10 w-40 h-40 bg-gold-600/5 rounded-full blur-3xl"></div>
 
           {/* Header */}
           <ScrollReveal direction="up">
             <div className="relative text-center mb-10 md:mb-14">
               <span className="inline-block px-4 py-2 bg-white/80 backdrop-blur-sm rounded-full text-sm font-medium text-black/70 mb-4 shadow-sm">
-                💬 Get in Touch
+                Get in Touch
               </span>
               <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold leading-[1.05] mb-3">
                 Contact <span className="text-gold-600">Us</span>
@@ -110,9 +120,12 @@ const Contact = () => {
           <div className="relative grid grid-cols-1 lg:grid-cols-3 gap-5">
             {/* Left column — contact info */}
             <div className="lg:col-span-1 flex flex-col gap-5">
-              {contactInfo.map((info, index) => (
-                <ScrollReveal key={info.title} direction="left" delay={index * 100}>
-                  <div className="group bg-white rounded-[1.75rem] p-5 flex items-center gap-4 hover:-translate-y-1 transition-all duration-300 shadow-sm hover:shadow-md">
+              {contactInfo.map((info, index) => {
+                const content = (
+                  <div
+                    key={info.title}
+                    className={`group bg-white rounded-[1.75rem] p-5 flex items-center gap-4 hover:-translate-y-1 transition-all duration-300 shadow-sm hover:shadow-md ${info.link ? 'cursor-pointer' : ''}`}
+                  >
                     <div
                       className="w-12 h-12 rounded-2xl flex items-center justify-center shrink-0 transition-all duration-300 group-hover:scale-110"
                       style={{ backgroundColor: info.bgColor }}
@@ -129,11 +142,24 @@ const Contact = () => {
                       <p className="text-xs text-black/40">{info.description}</p>
                     </div>
                   </div>
-                </ScrollReveal>
-              ))}
+                )
+
+                // If there's a link, wrap with anchor tag
+                return info.link ? (
+                  <ScrollReveal key={info.title} direction="left" delay={index * 100}>
+                    <a href={info.link} target={info.link.startsWith('http') ? '_blank' : '_self'} rel="noopener noreferrer">
+                      {content}
+                    </a>
+                  </ScrollReveal>
+                ) : (
+                  <ScrollReveal key={info.title} direction="left" delay={index * 100}>
+                    {content}
+                  </ScrollReveal>
+                )
+              })}
 
               {/* Business hours — dark tile */}
-              <ScrollReveal direction="left" delay={300}>
+              <ScrollReveal direction="left" delay={400}>
                 <div className="relative bg-black rounded-[1.75rem] p-6 overflow-hidden flex-1 group hover:shadow-xl transition-all duration-300">
                   <div className="absolute -bottom-10 -right-10 w-40 h-40 bg-[#D6F04C]/10 rounded-full blur-3xl pointer-events-none group-hover:bg-[#D6F04C]/20 transition-all duration-500"></div>
                   <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-[#D6F04C] via-gold-400 to-[#D6F04C] opacity-50"></div>
@@ -148,15 +174,15 @@ const Contact = () => {
                   <div className="relative space-y-2 text-sm text-white/60">
                     <div className="flex justify-between items-center py-1 border-b border-white/5">
                       <span>Monday – Friday</span>
-                      <span className="text-white/90 font-medium">9am – 6pm</span>
+                      <span className="text-white/90 font-medium">9:00AM – 6:00PM</span>
                     </div>
                     <div className="flex justify-between items-center py-1 border-b border-white/5">
                       <span>Saturday</span>
-                      <span className="text-white/90 font-medium">10am – 4pm</span>
+                      <span className="text-white/90 font-medium">10:00AM – 4:00PM</span>
                     </div>
                     <div className="flex justify-between items-center py-1">
                       <span>Sunday</span>
-                      <span className="text-white/40 font-medium">Closed</span>
+                      <span className="text-white/40 font-medium">Closed (DM for orders)</span>
                     </div>
                   </div>
                 </div>

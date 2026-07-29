@@ -73,9 +73,7 @@ const Navbar = () => {
     { name: 'Sandals', path: '/category/sandals', icon: faShoePrints },
     { name: 'Slippers', path: '/category/slippers', icon: faSocks },
     // ============ OTHER LINKS ============
-    { name: 'New Arrivals', path: '/products?sort=new', icon: faPlus },
-    { name: 'Sale', path: '/products?category=sale', icon: faTag },
-    { name: 'Featured', path: '/products?featured=true', icon: faStar },
+    { name: 'My Orders', path: '/orders', icon: faBox, section: 'Account' },
     { name: 'About Us', path: '/about', icon: faStore },
   ]
 
@@ -191,7 +189,7 @@ const Navbar = () => {
             >
               <FontAwesomeIcon icon={faShoppingBag} className="text-black/70 text-sm" />
               {totalItems > 0 && (
-                <span className="absolute -top-1 -right-1 bg-gold-600 text-white text-[10px] rounded-full w-4.5 h-4.5 min-w-[18px] h-[18px] flex items-center justify-center font-bold">
+                <span className="absolute -top-1 -right-1 bg-black text-white text-[10px] rounded-full w-4.5 h-4.5 min-w-[18px] h-[18px] flex items-center justify-center font-bold">
                   {totalItems > 9 ? '9+' : totalItems}
                 </span>
               )}
@@ -248,9 +246,8 @@ const Navbar = () => {
         </div>
 
         {/* Mobile menu - NO rounded corners, white background, scrollable */}
-        <div className={`lg:hidden overflow-hidden transition-all duration-300 ease-in-out ${
-          isMobileMenuOpen ? 'max-h-[80vh] opacity-100' : 'max-h-0 opacity-0'
-        }`}>
+        <div className={`lg:hidden overflow-hidden transition-all duration-300 ease-in-out ${isMobileMenuOpen ? 'max-h-[80vh] opacity-100' : 'max-h-0 opacity-0'
+          }`}>
           <div className="bg-white py-4 border-t border-gray-100 overflow-y-auto max-h-[70vh]">
             <form onSubmit={handleSearch} className="px-4 mb-4">
               <div className="relative">
@@ -269,7 +266,7 @@ const Navbar = () => {
                 </button>
               </div>
             </form>
-            
+
             <div className="space-y-0.5 px-4">
               {/* Mobile: Main Nav Links */}
               {navLinks.map((link) => (
@@ -282,7 +279,7 @@ const Navbar = () => {
                   {link.name}
                 </Link>
               ))}
-              
+
               {/* Mobile: Navigation Dropdown Links */}
               <div className="border-t border-gray-100 my-2 pt-2">
                 <p className="px-4 text-xs font-semibold text-black/40 uppercase tracking-wider py-1">Explore</p>
@@ -298,7 +295,7 @@ const Navbar = () => {
                   </Link>
                 ))}
               </div>
-              
+
               {/* Mobile: All Account & Management Links */}
               <div className="border-t border-gray-100 my-2 pt-2">
                 {Object.keys(groupedLinks).map((section) => (

@@ -41,6 +41,7 @@ const AdminLayout = () => {
   const [notifications, setNotifications] = useState([])
   const [unreadCount, setUnreadCount] = useState(0)
   const [stats, setStats] = useState(null)
+  const [processedOrderIds, setProcessedOrderIds] = useState(new Set())
   const navigate = useNavigate()
 
   // Fetch stats
@@ -93,17 +94,18 @@ const AdminLayout = () => {
   }
 
   // Update notification counts based on stats
-  const updateNotificationCounts = (stats) => {
-    if (!stats) return
+  const updateNotificationCounts = (statsData) => {
+    if (!statsData) return
     
     const newNotifications = []
-    const existingIds = notifications.map(n => n.id)
+    const existingIds = new Set(notifications.map(n => n.id))
     
-    // Check for new orders
-    if (stats.recentOrders && stats.recentOrders.length > 0) {
-      stats.recentOrders.forEach(order => {
+    // Check for new orders (only if not already processed)
+    if (statsData.recentOrders && statsData.recentOrders.length > 0) {
+      statsData.recentOrders.forEach(order => {
         const notifId = `order-${order._id}`
-        if (!existingIds.includes(notifId)) {
+        // Only add if not already processed and not already in notifications
+        if (!processedOrderIds.has(order._id) && !existingIds.has(notifId)) {
           newNotifications.push({
             id: notifId,
             type: 'order',
@@ -113,19 +115,21 @@ const AdminLayout = () => {
             read: false,
             link: 'orders'
           })
+          // Mark this order as processed
+          setProcessedOrderIds(prev => new Set(prev).add(order._id))
         }
       })
     }
 
-    // Check for new contacts
-    if (stats.newContacts && stats.newContacts > 0) {
+    // Check for new contacts (only add once)
+    if (statsData.newContacts && statsData.newContacts > 0) {
       const notifId = `contact-${Date.now()}`
-      if (!existingIds.includes(notifId)) {
+      if (!existingIds.has(notifId)) {
         newNotifications.push({
           id: notifId,
           type: 'contact',
           title: 'New Contact Message',
-          message: `You have ${stats.newContacts} new message(s)`,
+          message: `You have ${statsData.newContacts} new message(s)`,
           time: new Date().toLocaleString(),
           read: false,
           link: 'contacts'
@@ -133,15 +137,15 @@ const AdminLayout = () => {
       }
     }
 
-    // Check for new subscribers
-    if (stats.newSubscribers && stats.newSubscribers > 0) {
+    // Check for new subscribers (only add once)
+    if (statsData.newSubscribers && statsData.newSubscribers > 0) {
       const notifId = `subscriber-${Date.now()}`
-      if (!existingIds.includes(notifId)) {
+      if (!existingIds.has(notifId)) {
         newNotifications.push({
           id: notifId,
           type: 'subscriber',
           title: 'New Subscriber',
-          message: `You have ${stats.newSubscribers} new subscriber(s)`,
+          message: `You have ${statsData.newSubscribers} new subscriber(s)`,
           time: new Date().toLocaleString(),
           read: false,
           link: 'subscribers'
@@ -159,7 +163,15 @@ const AdminLayout = () => {
   const clearAllNotifications = () => {
     setNotifications([])
     setUnreadCount(0)
+    setProcessedOrderIds(new Set())
     toast.success('Notifications cleared')
+  }
+
+  // Mark all notifications as read
+  const markAllAsRead = () => {
+    setNotifications(prev => prev.map(n => ({ ...n, read: true })))
+    setUnreadCount(0)
+    toast.success('All notifications marked as read')
   }
 
   // Get notification icon based on type
@@ -221,7 +233,7 @@ const AdminLayout = () => {
       <div 
         className={`fixed inset-y-0 left-0 z-50 w-72 bg-white transform transition-all duration-300 ease-in-out ${
           isSidebarOpen ? 'translate-x-0' : '-translate-x-full'
-        } lg:translate-x-0 flex flex-col`}
+        } lg:translate-x-0 flex flex-col shadow-xl`}
       >
         {/* Brand */}
         <div className="p-6 border-b border-gray-100">
@@ -230,8 +242,7 @@ const AdminLayout = () => {
               <FontAwesomeIcon icon={faCrown} className="text-black text-lg" />
             </div>
             <div>
-              <span className="text-xl font-bold text-gray-800">Inez</span>
-              <span className="text-xl font-bold text-[#D6F04C]">Admin</span>
+              <span className="text-xl font-bold text-gray-800">Inez Admin</span>
             </div>
           </div>
           <div className="flex items-center gap-3 mt-4 pt-4 border-t border-gray-100">
@@ -336,11 +347,7 @@ const AdminLayout = () => {
                         {notifications.length > 0 && (
                           <>
                             <button
-                              onClick={() => {
-                                setNotifications(prev => prev.map(n => ({ ...n, read: true })))
-                                setUnreadCount(0)
-                                toast.success('All notifications marked as read')
-                              }}
+                              onClick={markAllAsRead}
                               className="text-xs text-[#D6F04C] hover:text-[#C5E043] transition-colors font-medium"
                             >
                               Mark all read
@@ -359,7 +366,7 @@ const AdminLayout = () => {
 
                     <div className="overflow-y-auto max-h-[350px]">
                       {notifications.length > 0 ? (
-                        notifications.map((notif) => {
+                        notifications.slice(0, 20).map((notif) => {
                           const iconInfo = getNotificationIcon(notif.type)
                           return (
                             <div
@@ -368,17 +375,15 @@ const AdminLayout = () => {
                                 !notif.read ? 'bg-[#D6F04C]/5' : ''
                               }`}
                               onClick={() => {
-                                // Mark as read locally
                                 setNotifications(prev =>
                                   prev.map(n =>
                                     n.id === notif.id ? { ...n, read: true } : n
                                   )
                                 )
                                 setUnreadCount(prev => Math.max(0, prev - 1))
-                                
+                                setIsNotificationOpen(false)
                                 if (notif.link) {
                                   setActivePage(notif.link)
-                                  setIsNotificationOpen(false)
                                 }
                               }}
                             >
@@ -408,19 +413,6 @@ const AdminLayout = () => {
                         </div>
                       )}
                     </div>
-
-                    {notifications.length > 0 && (
-                      <div className="px-4 py-2 border-t border-gray-100 text-center">
-                        <button
-                          onClick={() => {
-                            setIsNotificationOpen(false)
-                          }}
-                          className="text-xs text-[#D6F04C] hover:text-[#C5E043] transition-colors font-medium"
-                        >
-                          View all notifications
-                        </button>
-                      </div>
-                    )}
                   </div>
                 )}
               </div>

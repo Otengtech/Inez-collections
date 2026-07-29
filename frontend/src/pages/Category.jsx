@@ -213,7 +213,7 @@ const CategoryPage = () => {
           <div className={`relative bg-gradient-to-br ${info.bg} rounded-[2rem] p-6 sm:p-10 mb-6`}>
             <div className="flex items-center gap-4">
               <Link
-                to="/products"
+                to="/"
                 className="w-10 h-10 rounded-full bg-white/80 backdrop-blur-sm flex items-center justify-center hover:bg-white transition-colors"
               >
                 <FontAwesomeIcon icon={faArrowLeft} className="text-black/60" />
@@ -429,7 +429,7 @@ const CategoryPage = () => {
                 : 'grid-cols-1'
             } gap-5`}>
               {products.map((product, index) => (
-                <ScrollReveal key={product._id} direction="up" delay={(index % 4) * 100}>
+                <ScrollReveal key={`${product._id}-${index}-${products.length}`} direction="down" delay={(index % 4) * 100}>
                   {viewMode === 'grid' ? (
                     // Grid View
                     <div className="bg-white rounded-[1.75rem] overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 group">

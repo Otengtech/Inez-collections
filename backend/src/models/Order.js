@@ -1,3 +1,4 @@
+// models/Order.js
 import mongoose from 'mongoose';
 
 const orderSchema = new mongoose.Schema(
@@ -61,26 +62,11 @@ const orderSchema = new mongoose.Schema(
         required: [true, 'Address is required'],
         trim: true,
       },
-      city: {
+      deliveryType: {
         type: String,
-        required: [true, 'City is required'],
-        trim: true,
-      },
-      state: {
-        type: String,
-        required: [true, 'State is required'],
-        trim: true,
-      },
-      zipCode: {
-        type: String,
-        required: [true, 'Zip code is required'],
-        trim: true,
-      },
-      country: {
-        type: String,
-        required: [true, 'Country is required'],
-        trim: true,
-        default: 'USA',
+        enum: ['delivery', 'pickup'],
+        default: 'delivery',
+        required: true,
       },
     },
     status: {
@@ -108,11 +94,9 @@ const orderSchema = new mongoose.Schema(
   }
 );
 
-// Index for efficient queries
 orderSchema.index({ guestId: 1, createdAt: -1 });
 orderSchema.index({ status: 1, createdAt: -1 });
 
-// Pre-save middleware to calculate total
 orderSchema.pre('save', function (next) {
   if (this.isModified('items')) {
     this.totalAmount = this.items.reduce((sum, item) => sum + item.price * item.quantity, 0);

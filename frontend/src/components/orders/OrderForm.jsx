@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faLock, faArrowRight } from '@fortawesome/free-solid-svg-icons'
+import { faLock, faArrowRight, faTruck, faStore } from '@fortawesome/free-solid-svg-icons'
 
 const ArrowUpRight = ({ className = '' }) => (
   <FontAwesomeIcon icon={faArrowRight} className={`-rotate-45 ${className}`} />
@@ -12,10 +12,7 @@ const OrderForm = ({ onSubmit, loading }) => {
     email: '',
     phone: '',
     address: '',
-    city: '',
-    state: '',
-    zipCode: '',
-    country: 'USA',
+    deliveryType: 'delivery', // 'delivery' or 'pickup'
   })
 
   const handleChange = (e) => {
@@ -32,35 +29,34 @@ const OrderForm = ({ onSubmit, loading }) => {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-5">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-        <div>
-          <label className="block text-sm font-medium text-black/70 mb-1.5">
-            Full Name *
-          </label>
-          <input
-            type="text"
-            name="fullName"
-            value={formData.fullName}
-            onChange={handleChange}
-            className="w-full px-4 py-3 bg-[#F4F6F2] rounded-xl focus:outline-none focus:ring-2 focus:ring-gold-200 focus:bg-white transition-all text-sm border border-transparent focus:border-gold-300"
-            placeholder="John Doe"
-            required
-          />
-        </div>
-        <div>
-          <label className="block text-sm font-medium text-black/70 mb-1.5">
-            Email *
-          </label>
-          <input
-            type="email"
-            name="email"
-            value={formData.email}
-            onChange={handleChange}
-            className="w-full px-4 py-3 bg-[#F4F6F2] rounded-xl focus:outline-none focus:ring-2 focus:ring-gold-200 focus:bg-white transition-all text-sm border border-transparent focus:border-gold-300"
-            placeholder="john@example.com"
-            required
-          />
-        </div>
+      <div>
+        <label className="block text-sm font-medium text-black/70 mb-1.5">
+          Full Name *
+        </label>
+        <input
+          type="text"
+          name="fullName"
+          value={formData.fullName}
+          onChange={handleChange}
+          className="w-full px-4 py-3 bg-[#F4F6F2] rounded-xl focus:outline-none focus:ring-2 focus:ring-gold-200 focus:bg-white transition-all text-sm border border-transparent focus:border-gold-300"
+          placeholder="John Doe"
+          required
+        />
+      </div>
+
+      <div>
+        <label className="block text-sm font-medium text-black/70 mb-1.5">
+          Email *
+        </label>
+        <input
+          type="email"
+          name="email"
+          value={formData.email}
+          onChange={handleChange}
+          className="w-full px-4 py-3 bg-[#F4F6F2] rounded-xl focus:outline-none focus:ring-2 focus:ring-gold-200 focus:bg-white transition-all text-sm border border-transparent focus:border-gold-300"
+          placeholder="john@example.com"
+          required
+        />
       </div>
 
       <div>
@@ -73,14 +69,14 @@ const OrderForm = ({ onSubmit, loading }) => {
           value={formData.phone}
           onChange={handleChange}
           className="w-full px-4 py-3 bg-[#F4F6F2] rounded-xl focus:outline-none focus:ring-2 focus:ring-gold-200 focus:bg-white transition-all text-sm border border-transparent focus:border-gold-300"
-          placeholder="+1 (555) 123-4567"
+          placeholder="+233 XX XXX XXXX"
           required
         />
       </div>
 
       <div>
         <label className="block text-sm font-medium text-black/70 mb-1.5">
-          Address *
+          Address / Location *
         </label>
         <input
           type="text"
@@ -88,72 +84,41 @@ const OrderForm = ({ onSubmit, loading }) => {
           value={formData.address}
           onChange={handleChange}
           className="w-full px-4 py-3 bg-[#F4F6F2] rounded-xl focus:outline-none focus:ring-2 focus:ring-gold-200 focus:bg-white transition-all text-sm border border-transparent focus:border-gold-300"
-          placeholder="123 Main St"
+          placeholder="123 Main St, Accra"
           required
         />
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-        <div>
-          <label className="block text-sm font-medium text-black/70 mb-1.5">
-            City *
-          </label>
-          <input
-            type="text"
-            name="city"
-            value={formData.city}
-            onChange={handleChange}
-            className="w-full px-4 py-3 bg-[#F4F6F2] rounded-xl focus:outline-none focus:ring-2 focus:ring-gold-200 focus:bg-white transition-all text-sm border border-transparent focus:border-gold-300"
-            placeholder="New York"
-            required
-          />
-        </div>
-        <div>
-          <label className="block text-sm font-medium text-black/70 mb-1.5">
-            State *
-          </label>
-          <input
-            type="text"
-            name="state"
-            value={formData.state}
-            onChange={handleChange}
-            className="w-full px-4 py-3 bg-[#F4F6F2] rounded-xl focus:outline-none focus:ring-2 focus:ring-gold-200 focus:bg-white transition-all text-sm border border-transparent focus:border-gold-300"
-            placeholder="NY"
-            required
-          />
-        </div>
-        <div>
-          <label className="block text-sm font-medium text-black/70 mb-1.5">
-            Zip Code *
-          </label>
-          <input
-            type="text"
-            name="zipCode"
-            value={formData.zipCode}
-            onChange={handleChange}
-            className="w-full px-4 py-3 bg-[#F4F6F2] rounded-xl focus:outline-none focus:ring-2 focus:ring-gold-200 focus:bg-white transition-all text-sm border border-transparent focus:border-gold-300"
-            placeholder="10001"
-            required
-          />
-        </div>
-      </div>
-
       <div>
         <label className="block text-sm font-medium text-black/70 mb-1.5">
-          Country
+          Delivery Type *
         </label>
-        <select
-          name="country"
-          value={formData.country}
-          onChange={handleChange}
-          className="w-full px-4 py-3 bg-[#F4F6F2] rounded-xl focus:outline-none focus:ring-2 focus:ring-gold-200 focus:bg-white transition-all text-sm border border-transparent focus:border-gold-300"
-        >
-          <option value="USA">USA</option>
-          <option value="Canada">Canada</option>
-          <option value="UK">UK</option>
-          <option value="Nigeria">Nigeria</option>
-          <option value="Other">Other</option>
-        </select>
+        <div className="grid grid-cols-2 gap-3">
+          <button
+            type="button"
+            onClick={() => setFormData({ ...formData, deliveryType: 'delivery' })}
+            className={`flex items-center justify-center gap-2 px-4 py-3 rounded-xl border-2 transition-all ${
+              formData.deliveryType === 'delivery'
+                ? 'border-[#D6F04C] bg-[#D6F04C]/10 text-black'
+                : 'border-gray-200 bg-[#F4F6F2] text-gray-600 hover:border-gray-300'
+            }`}
+          >
+            <FontAwesomeIcon icon={faTruck} className="text-sm" />
+            <span className="text-sm font-medium">Delivery</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => setFormData({ ...formData, deliveryType: 'pickup' })}
+            className={`flex items-center justify-center gap-2 px-4 py-3 rounded-xl border-2 transition-all ${
+              formData.deliveryType === 'pickup'
+                ? 'border-[#D6F04C] bg-[#D6F04C]/10 text-black'
+                : 'border-gray-200 bg-[#F4F6F2] text-gray-600 hover:border-gray-300'
+            }`}
+          >
+            <FontAwesomeIcon icon={faStore} className="text-sm" />
+            <span className="text-sm font-medium">Pickup</span>
+          </button>
+        </div>
       </div>
 
       <button
