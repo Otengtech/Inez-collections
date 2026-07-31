@@ -578,3 +578,170 @@ export const getAllOrders = async (req, res) => {
     });
   }
 };
+
+// controllers/orderController.js
+
+// @desc    Delete order (admin only)
+// @route   DELETE /api/orders/:orderId
+// @access  Private/Admin
+export const deleteOrder = async (req, res) => {
+  try {
+    const { orderId } = req.params;
+
+    // Find the order
+    const order = await Order.findById(orderId);
+
+    if (!order) {
+      return res.status(404).json({
+        success: false,
+        message: 'Order not found',
+      });
+    }
+
+    // Check if order can be deleted (only cancelled or delivered orders can be deleted)
+    if (order.status === 'pending' || order.status === 'processing' || order.status === 'shipped') {
+      return res.status(400).json({
+        success: false,
+        message: 'Cannot delete an order that is pending, processing, or shipped. Please cancel it first.',
+      });
+    }
+
+    // If order is cancelled, restore product stock before deleting
+    if (order.status === 'cancelled') {
+      for (const item of order.items) {
+        await Product.findByIdAndUpdate(item.productId, {
+          $inc: { stock: item.quantity },
+        });
+      }
+    }
+
+    // Delete the order
+    await Order.findByIdAndDelete(orderId);
+
+    console.log(`🗑️ Order ${orderId} deleted successfully`);
+
+    res.json({
+      success: true,
+      message: 'Order deleted successfully',
+    });
+  } catch (error) {
+    console.error('Delete order error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error deleting order',
+      error: error.message,
+    });
+  }
+};
+
+// @desc    Delete multiple orders (admin only)
+// @route   DELETE /api/orders/bulk-delete
+// @access  Private/Admin
+export const bulkDeleteOrders = async (req, res) => {
+  try {
+    const { orderIds } = req.body;
+
+    if (!orderIds || !orderIds.length) {
+      return res.status(400).json({
+        success: false,
+        message: 'Please provide order IDs to delete',
+      });
+    }
+
+    // Find all orders
+    const orders = await Order.find({ _id: { $in: orderIds } });
+
+    if (!orders.length) {
+      return res.status(404).json({
+        success: false,
+        message: 'No orders found to delete',
+      });
+    }
+
+    // Check for orders that cannot be deleted
+    const invalidOrders = orders.filter(
+      order => order.status === 'pending' || order.status === 'processing' || order.status === 'shipped'
+    );
+
+    if (invalidOrders.length > 0) {
+      return res.status(400).json({
+        success: false,
+        message: `Cannot delete ${invalidOrders.length} order(s) that are pending, processing, or shipped. Please cancel them first.`,
+        invalidOrderIds: invalidOrders.map(o => o._id),
+      });
+    }
+
+    // Restore stock for cancelled orders
+    for (const order of orders) {
+      if (order.status === 'cancelled') {
+        for (const item of order.items) {
+          await Product.findByIdAndUpdate(item.productId, {
+            $inc: { stock: item.quantity },
+          });
+        }
+      }
+    }
+
+    // Delete all orders
+    const result = await Order.deleteMany({ _id: { $in: orderIds } });
+
+    console.log(`🗑️ ${result.deletedCount} orders deleted successfully`);
+
+    res.json({
+      success: true,
+      message: `${result.deletedCount} order(s) deleted successfully`,
+      deletedCount: result.deletedCount,
+    });
+  } catch (error) {
+    console.error('Bulk delete orders error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error deleting orders',
+      error: error.message,
+    });
+  }
+};
+
+// @desc    Force delete order (admin only - no restrictions)
+// @route   DELETE /api/orders/:orderId/force
+// @access  Private/Admin
+export const forceDeleteOrder = async (req, res) => {
+  try {
+    const { orderId } = req.params;
+
+    const order = await Order.findById(orderId);
+
+    if (!order) {
+      return res.status(404).json({
+        success: false,
+        message: 'Order not found',
+      });
+    }
+
+    // Restore stock for cancelled orders
+    if (order.status === 'cancelled') {
+      for (const item of order.items) {
+        await Product.findByIdAndUpdate(item.productId, {
+          $inc: { stock: item.quantity },
+        });
+      }
+    }
+
+    // Force delete the order
+    await Order.findByIdAndDelete(orderId);
+
+    console.log(`🗑️ Order ${orderId} force deleted successfully`);
+
+    res.json({
+      success: true,
+      message: 'Order force deleted successfully',
+    });
+  } catch (error) {
+    console.error('Force delete order error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error deleting order',
+      error: error.message,
+    });
+  }
+};

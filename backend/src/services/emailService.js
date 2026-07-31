@@ -1047,100 +1047,752 @@ export const emailTemplates = {
   }),
 
   newsletterWelcome: (email) => ({
-    subject: 'Welcome to Our Newsletter! 🎉',
-    html: `
-      <!DOCTYPE html>
-      <html>
-      <head>
-        <style>
-          body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
-          .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-          .header { background: linear-gradient(135deg, #FFD700, #C9A84C); padding: 20px; text-align: center; }
-          .header h1 { color: #000; margin: 0; }
-          .content { padding: 20px; background: #f9f9f9; }
-          .footer { text-align: center; padding: 20px; font-size: 12px; color: #888; }
-          .button { display: inline-block; padding: 10px 20px; background: #000; color: #FFD700; text-decoration: none; border-radius: 5px; }
-        </style>
-      </head>
-      <body>
-        <div class="container">
-          <div class="header">
-            <h1>🎉 Welcome to Our Community!</h1>
+  subject: 'Welcome to Our Newsletter! 🎉',
+  html: `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <style>
+        * {
+          margin: 0;
+          padding: 0;
+          box-sizing: border-box;
+        }
+        body {
+          font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+          line-height: 1.6;
+          color: #1a1a1a;
+          background: #f5f5f5;
+          padding: 20px;
+          -webkit-font-smoothing: antialiased;
+          -moz-osx-font-smoothing: grayscale;
+        }
+        .container {
+          max-width: 600px;
+          margin: 0 auto;
+          background: #EDF1EC;
+          border-radius: 40px;
+          overflow: hidden;
+          box-shadow: 0 20px 60px rgba(0,0,0,0.06);
+        }
+        /* Header - matching HeroSection style */
+        .header {
+          background: #ffffff;
+          padding: 40px 30px 30px;
+          text-align: center;
+          border-bottom: 1px solid rgba(0,0,0,0.05);
+          position: relative;
+        }
+        .header::after {
+          content: '';
+          position: absolute;
+          bottom: -1px;
+          left: 50%;
+          transform: translateX(-50%);
+          width: 80px;
+          height: 3px;
+          background: #D6F04C;
+          border-radius: 2px;
+        }
+        .header-logo {
+          display: inline-block;
+          background: #D6F04C;
+          color: #1a1a1a;
+          width: 56px;
+          height: 56px;
+          border-radius: 50%;
+          line-height: 56px;
+          font-size: 24px;
+          font-weight: 700;
+          margin-bottom: 12px;
+        }
+        .header h1 {
+          color: #1a1a1a;
+          font-size: 28px;
+          font-weight: 700;
+          letter-spacing: -0.5px;
+          margin: 0;
+        }
+        .header .subtitle {
+          color: #666;
+          font-size: 14px;
+          margin-top: 6px;
+          letter-spacing: 0.5px;
+          font-weight: 400;
+        }
+        /* Content */
+        .content {
+          padding: 30px;
+        }
+        .greeting {
+          font-size: 18px;
+          font-weight: 500;
+          color: #1a1a1a;
+          margin-bottom: 10px;
+        }
+        .greeting strong {
+          color: #1a1a1a;
+        }
+        .welcome-message {
+          color: #666;
+          font-size: 15px;
+          margin-bottom: 25px;
+          line-height: 1.7;
+        }
+        /* Benefits Card */
+        .benefits-card {
+          background: #ffffff;
+          border-radius: 20px;
+          padding: 25px;
+          margin: 20px 0;
+          box-shadow: 0 4px 20px rgba(0,0,0,0.04);
+          border: 1px solid rgba(0,0,0,0.03);
+        }
+        .benefits-card h3 {
+          font-size: 15px;
+          font-weight: 600;
+          color: #1a1a1a;
+          margin-bottom: 15px;
+          letter-spacing: -0.3px;
+        }
+        .benefits-list {
+          list-style: none;
+          padding: 0;
+          margin: 0;
+        }
+        .benefits-list li {
+          padding: 10px 0;
+          border-bottom: 1px solid #f0f0f0;
+          color: #555;
+          font-size: 14px;
+          display: flex;
+          align-items: center;
+          gap: 10px;
+        }
+        .benefits-list li:last-child {
+          border-bottom: none;
+        }
+        .benefits-list li .icon {
+          font-size: 18px;
+          width: 30px;
+          display: inline-block;
+          text-align: center;
+        }
+        /* CTA Button - matching hero style */
+        .button-container {
+          text-align: center;
+          margin: 25px 0 20px;
+        }
+        .button {
+          display: inline-block;
+          padding: 14px 40px;
+          background: #1a1a1a;
+          color: #D6F04C;
+          text-decoration: none;
+          border-radius: 50px;
+          font-weight: 600;
+          font-size: 15px;
+          border: 2px solid #1a1a1a;
+          transition: all 0.3s ease;
+        }
+        .button:hover {
+          background: #D6F04C;
+          color: #1a1a1a;
+          border-color: #D6F04C;
+        }
+        /* Unsubscribe note */
+        .unsubscribe-note {
+          background: #f8f9f6;
+          border-radius: 16px;
+          padding: 15px 20px;
+          margin: 20px 0;
+          text-align: center;
+          border: 1px solid rgba(0,0,0,0.03);
+        }
+        .unsubscribe-note p {
+          color: #888;
+          font-size: 13px;
+          margin: 0;
+          line-height: 1.6;
+        }
+        .unsubscribe-note a {
+          color: #1a1a1a;
+          text-decoration: underline;
+          font-weight: 500;
+        }
+        .unsubscribe-note a:hover {
+          color: #D6F04C;
+        }
+        .heart-message {
+          text-align: center;
+          font-size: 16px;
+          color: #1a1a1a;
+          margin-top: 20px;
+          font-weight: 500;
+        }
+        /* Footer */
+        .footer {
+          background: #ffffff;
+          padding: 30px;
+          text-align: center;
+          border-top: 1px solid rgba(0,0,0,0.04);
+        }
+        .footer .brand {
+          display: inline-block;
+          background: #D6F04C;
+          color: #1a1a1a;
+          padding: 4px 16px;
+          border-radius: 20px;
+          font-weight: 700;
+          font-size: 14px;
+          margin-bottom: 10px;
+        }
+        .footer p {
+          font-size: 12px;
+          color: #999;
+          margin: 5px 0;
+          line-height: 1.6;
+        }
+        .footer .email-note {
+          font-size: 11px;
+          color: #bbb;
+        }
+        .footer .unsubscribe-link {
+          color: #999;
+          text-decoration: underline;
+          font-size: 11px;
+        }
+        .footer .unsubscribe-link:hover {
+          color: #D6F04C;
+        }
+        /* Responsive */
+        @media (max-width: 480px) {
+          body {
+            padding: 10px;
+          }
+          .content {
+            padding: 20px;
+          }
+          .header {
+            padding: 30px 20px 25px;
+          }
+          .header h1 {
+            font-size: 24px;
+          }
+          .button {
+            padding: 12px 30px;
+            font-size: 14px;
+            width: 100%;
+            box-sizing: border-box;
+            text-align: center;
+          }
+          .benefits-list li {
+            font-size: 13px;
+            padding: 8px 0;
+          }
+          .benefits-list li .icon {
+            width: 24px;
+            font-size: 16px;
+          }
+        }
+        @media (max-width: 400px) {
+          .benefits-list li {
+            flex-wrap: wrap;
+          }
+          .benefits-list li .icon {
+            width: 20px;
+          }
+        }
+        /* Outlook fixes */
+        .benefits-list li {
+          display: block;
+          padding: 8px 0;
+        }
+        .benefits-list li .icon {
+          margin-right: 8px;
+        }
+      </style>
+    </head>
+    <body>
+      <div class="container">
+        <!-- Header - matching HeroSection style -->
+        <div class="header">
+          <div class="header-logo">I</div>
+          <h1>Welcome to Our Community! 🎉</h1>
+          <div class="subtitle">You're now part of the family</div>
+        </div>
+        
+        <!-- Content -->
+        <div class="content">
+          <div class="greeting">
+            Hello <strong>${email}</strong>! 👋
           </div>
-          <div class="content">
-            <h2>Hello!</h2>
-            <p>Thank you for subscribing to our newsletter!</p>
-            <p>You'll now receive exclusive updates about:</p>
-            <ul>
-              <li>✨ New product arrivals</li>
-              <li>💎 Special discounts and promotions</li>
-              <li>🎨 Fashion tips and trends</li>
-              <li>🎁 Exclusive member-only offers</li>
+          
+          <p class="welcome-message">
+            Thank you for subscribing to our newsletter! We're thrilled to have you on board.
+            Get ready for exclusive updates, special offers, and fashion inspiration delivered straight to your inbox.
+          </p>
+          
+          <!-- Benefits Card -->
+          <div class="benefits-card">
+            <h3>✨ What You'll Receive</h3>
+            <ul class="benefits-list">
+              <li>
+                <span class="icon">✨</span>
+                <span><strong>New Product Arrivals</strong> — Be the first to know about our latest collections</span>
+              </li>
+              <li>
+                <span class="icon">💎</span>
+                <span><strong>Special Discounts</strong> — Exclusive subscriber-only promotions</span>
+              </li>
+              <li>
+                <span class="icon">🎨</span>
+                <span><strong>Fashion Tips</strong> — Style inspiration and trend guides</span>
+              </li>
+              <li>
+                <span class="icon">🎁</span>
+                <span><strong>Member-Only Offers</strong> — Early access to sales and events</span>
+              </li>
             </ul>
-
-            <p>Check out our latest collection:</p>
-            <p>
-              <a href="${process.env.CLIENT_URL}/products" class="button">
-                Shop Now
-              </a>
-            </p>
-
-            <p>You can unsubscribe at any time by clicking the link at the bottom of our emails.</p>
-            <p>Happy shopping! ❤️</p>
           </div>
-          <div class="footer">
-            <p>${email}</p>
-            <p>&copy; ${new Date().getFullYear()} Your E-Commerce Store</p>
+
+          <!-- CTA Button -->
+          <div class="button-container">
+            <a href="${process.env.CLIENT_URL || '#'}/products" class="button">
+              🛍️ Shop Our Collection →
+            </a>
+          </div>
+
+          <!-- Unsubscribe Note -->
+          <div class="unsubscribe-note">
+            <p>
+              You can unsubscribe at any time by clicking the link at the bottom of our emails.
+              We respect your privacy and will never share your information.
+            </p>
+          </div>
+
+          <div class="heart-message">
+            Happy shopping! ❤️
           </div>
         </div>
-      </body>
-      </html>
-    `,
-  }),
+
+        <!-- Footer -->
+        <div class="footer">
+          <div class="brand">✨ Inez</div>
+          <p>&copy; ${new Date().getFullYear()} Inez. All rights reserved.</p>
+          <p class="email-note">This email was sent to ${email}</p>
+          <p>
+            <a href="${process.env.CLIENT_URL || '#'}/unsubscribe?email=${email}" class="unsubscribe-link">
+              Unsubscribe from newsletter
+            </a>
+          </p>
+        </div>
+      </div>
+    </body>
+    </html>
+  `,
+}),
 
   contactAutoReply: (name, email) => ({
-    subject: 'Thank You for Contacting Us! 💬',
-    html: `
-      <!DOCTYPE html>
-      <html>
-      <head>
-        <style>
-          body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
-          .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-          .header { background: linear-gradient(135deg, #FFD700, #C9A84C); padding: 20px; text-align: center; }
-          .header h1 { color: #000; margin: 0; }
-          .content { padding: 20px; background: #f9f9f9; }
-          .footer { text-align: center; padding: 20px; font-size: 12px; color: #888; }
-        </style>
-      </head>
-      <body>
-        <div class="container">
-          <div class="header">
-            <h1>💬 Thank You for Reaching Out!</h1>
+  subject: 'Thank You for Contacting Us! 💬',
+  html: `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <style>
+        * {
+          margin: 0;
+          padding: 0;
+          box-sizing: border-box;
+        }
+        body {
+          font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+          line-height: 1.6;
+          color: #1a1a1a;
+          background: #f5f5f5;
+          padding: 20px;
+          -webkit-font-smoothing: antialiased;
+          -moz-osx-font-smoothing: grayscale;
+        }
+        .container {
+          max-width: 600px;
+          margin: 0 auto;
+          background: #EDF1EC;
+          border-radius: 40px;
+          overflow: hidden;
+          box-shadow: 0 20px 60px rgba(0,0,0,0.06);
+        }
+        /* Header - matching HeroSection style */
+        .header {
+          background: #ffffff;
+          padding: 40px 30px 30px;
+          text-align: center;
+          border-bottom: 1px solid rgba(0,0,0,0.05);
+          position: relative;
+        }
+        .header::after {
+          content: '';
+          position: absolute;
+          bottom: -1px;
+          left: 50%;
+          transform: translateX(-50%);
+          width: 80px;
+          height: 3px;
+          background: #D6F04C;
+          border-radius: 2px;
+        }
+        .header-logo {
+          display: inline-block;
+          background: #D6F04C;
+          color: #1a1a1a;
+          width: 56px;
+          height: 56px;
+          border-radius: 50%;
+          line-height: 56px;
+          font-size: 24px;
+          font-weight: 700;
+          margin-bottom: 12px;
+        }
+        .header h1 {
+          color: #1a1a1a;
+          font-size: 28px;
+          font-weight: 700;
+          letter-spacing: -0.5px;
+          margin: 0;
+        }
+        .header .subtitle {
+          color: #666;
+          font-size: 14px;
+          margin-top: 6px;
+          letter-spacing: 0.5px;
+          font-weight: 400;
+        }
+        /* Content */
+        .content {
+          padding: 30px;
+        }
+        .greeting {
+          font-size: 18px;
+          font-weight: 500;
+          color: #1a1a1a;
+          margin-bottom: 10px;
+        }
+        .greeting strong {
+          color: #1a1a1a;
+        }
+        .thank-you-message {
+          color: #666;
+          font-size: 15px;
+          margin-bottom: 25px;
+          line-height: 1.7;
+        }
+        /* Info Cards */
+        .info-card {
+          background: #ffffff;
+          border-radius: 20px;
+          padding: 25px;
+          margin: 20px 0;
+          box-shadow: 0 4px 20px rgba(0,0,0,0.04);
+          border: 1px solid rgba(0,0,0,0.03);
+        }
+        .info-card h3 {
+          font-size: 15px;
+          font-weight: 600;
+          color: #1a1a1a;
+          margin-bottom: 15px;
+          letter-spacing: -0.3px;
+        }
+        .info-list {
+          list-style: none;
+          padding: 0;
+          margin: 0;
+        }
+        .info-list li {
+          padding: 10px 0;
+          border-bottom: 1px solid #f0f0f0;
+          color: #555;
+          font-size: 14px;
+          display: flex;
+          align-items: center;
+          gap: 10px;
+        }
+        .info-list li:last-child {
+          border-bottom: none;
+        }
+        .info-list li .icon {
+          font-size: 18px;
+          width: 30px;
+          display: inline-block;
+        }
+        /* Social Links */
+        .social-section {
+          background: #ffffff;
+          border-radius: 20px;
+          padding: 20px;
+          margin: 20px 0;
+          text-align: center;
+          border: 1px solid rgba(0,0,0,0.03);
+          box-shadow: 0 4px 20px rgba(0,0,0,0.04);
+        }
+        .social-section p {
+          color: #666;
+          font-size: 14px;
+          margin-bottom: 12px;
+        }
+        .social-links {
+          display: table;
+          width: 100%;
+          border-collapse: separate;
+          border-spacing: 10px 0;
+        }
+        .social-links .social-cell {
+          display: table-cell;
+          text-align: center;
+          width: 50%;
+        }
+        .social-button {
+          display: inline-block;
+          padding: 10px 20px;
+          background: #1a1a1a;
+          color: #D6F04C;
+          text-decoration: none;
+          border-radius: 50px;
+          font-weight: 600;
+          font-size: 13px;
+          border: 2px solid #1a1a1a;
+          transition: all 0.3s ease;
+          width: 100%;
+          box-sizing: border-box;
+          text-align: center;
+        }
+        .social-button:hover {
+          background: #D6F04C;
+          color: #1a1a1a;
+          border-color: #D6F04C;
+        }
+        .social-button.instagram {
+          background: #E4405F;
+          border-color: #E4405F;
+          color: #ffffff;
+        }
+        .social-button.instagram:hover {
+          background: #c13584;
+          border-color: #c13584;
+        }
+        .social-button.snapchat {
+          background: #FFFC00;
+          border-color: #FFFC00;
+          color: #1a1a1a;
+        }
+        .social-button.snapchat:hover {
+          background: #e6e300;
+          border-color: #e6e300;
+        }
+        /* CTA Button */
+        .button-container {
+          text-align: center;
+          margin: 25px 0 20px;
+        }
+        .button {
+          display: inline-block;
+          padding: 14px 40px;
+          background: #1a1a1a;
+          color: #D6F04C;
+          text-decoration: none;
+          border-radius: 50px;
+          font-weight: 600;
+          font-size: 15px;
+          border: 2px solid #1a1a1a;
+          transition: all 0.3s ease;
+        }
+        .button:hover {
+          background: #D6F04C;
+          color: #1a1a1a;
+          border-color: #D6F04C;
+        }
+        .support-text {
+          color: #888;
+          font-size: 14px;
+          text-align: center;
+          margin-top: 20px;
+          line-height: 1.6;
+        }
+        .heart-message {
+          text-align: center;
+          font-size: 16px;
+          color: #1a1a1a;
+          margin-top: 20px;
+          font-weight: 500;
+        }
+        /* Footer */
+        .footer {
+          background: #ffffff;
+          padding: 30px;
+          text-align: center;
+          border-top: 1px solid rgba(0,0,0,0.04);
+        }
+        .footer .brand {
+          display: inline-block;
+          background: #D6F04C;
+          color: #1a1a1a;
+          padding: 4px 16px;
+          border-radius: 20px;
+          font-weight: 700;
+          font-size: 14px;
+          margin-bottom: 10px;
+        }
+        .footer p {
+          font-size: 12px;
+          color: #999;
+          margin: 5px 0;
+          line-height: 1.6;
+        }
+        .footer .email-note {
+          font-size: 11px;
+          color: #bbb;
+        }
+        /* Responsive */
+        @media (max-width: 480px) {
+          body {
+            padding: 10px;
+          }
+          .content {
+            padding: 20px;
+          }
+          .header {
+            padding: 30px 20px 25px;
+          }
+          .header h1 {
+            font-size: 24px;
+          }
+          .social-links {
+            display: block;
+            border-spacing: 0;
+          }
+          .social-links .social-cell {
+            display: block;
+            width: 100%;
+            margin-bottom: 10px;
+          }
+          .social-button {
+            width: 100%;
+          }
+          .button {
+            padding: 12px 30px;
+            font-size: 14px;
+            width: 100%;
+            box-sizing: border-box;
+            text-align: center;
+          }
+          .info-list li {
+            font-size: 13px;
+            padding: 8px 0;
+          }
+        }
+        @media (max-width: 400px) {
+          .info-list li {
+            flex-wrap: wrap;
+          }
+          .info-list li .icon {
+            width: 24px;
+          }
+        }
+        /* Outlook fixes */
+        .info-list li {
+          display: block;
+          padding: 8px 0;
+        }
+        .info-list li .icon {
+          margin-right: 8px;
+        }
+      </style>
+    </head>
+    <body>
+      <div class="container">
+        <!-- Header - matching HeroSection style -->
+        <div class="header">
+          <div class="header-logo">I</div>
+          <h1>Thank You for Reaching Out! 💬</h1>
+          <div class="subtitle">We're here to help</div>
+        </div>
+        
+        <!-- Content -->
+        <div class="content">
+          <div class="greeting">
+            Dear <strong>${name}</strong>,
           </div>
-          <div class="content">
-            <h2>Dear ${name},</h2>
-            <p>Thank you for contacting us! We've received your message and will get back to you within 24-48 hours.</p>
-            
-            <p>In the meantime, you might find answers to common questions in our:</p>
-            <ul>
-              <li>📚 FAQ section</li>
-              <li>📦 Shipping and delivery information</li>
-              <li>🔄 Return and exchange policy</li>
+          
+          <p class="thank-you-message">
+            Thank you for contacting us! We've received your message and will get back to you within 24-48 hours.
+          </p>
+          
+          <!-- Quick Links Card -->
+          <div class="info-card">
+            <h3>📌 Helpful Resources</h3>
+            <ul class="info-list">
+              <li>
+                <span class="icon">📚</span>
+                <span>Visit our FAQ section for quick answers</span>
+              </li>
+              <li>
+                <span class="icon">📦</span>
+                <span>Check shipping and delivery information</span>
+              </li>
+              <li>
+                <span class="icon">🔄</span>
+                <span>Review our return and exchange policy</span>
+              </li>
             </ul>
-
-            <p>If your query is urgent, you can also reach us through our social media channels.</p>
-            <p>We appreciate your interest in our store! ❤️</p>
           </div>
-          <div class="footer">
-            <p>${email}</p>
-            <p>&copy; ${new Date().getFullYear()} Your E-Commerce Store</p>
+
+          <!-- Social Section -->
+          <div class="social-section">
+            <p>📱 Connect with us on social media for faster responses</p>
+            <div class="social-links">
+              <div class="social-cell">
+                <a href="https://instagram.com/maame_esi67" target="_blank" class="social-button instagram">
+                  📸 Instagram
+                </a>
+              </div>
+              <div class="social-cell">
+                <a href="https://snapchat.com/add/eee_nez" target="_blank" class="social-button snapchat">
+                  👻 Snapchat
+                </a>
+              </div>
+            </div>
+          </div>
+
+          <!-- Shop CTA -->
+          <div class="button-container">
+            <a href="${process.env.CLIENT_URL || '#'}/products" class="button">
+              🛍️ Shop Our Collection →
+            </a>
+          </div>
+
+          <p class="support-text">
+            💡 If your query is urgent, you can also reach us through our social media channels.
+          </p>
+
+          <div class="heart-message">
+            We appreciate your interest in our store! ❤️
           </div>
         </div>
-      </body>
-      </html>
-    `,
-  }),
+
+        <!-- Footer -->
+        <div class="footer">
+          <div class="brand">✨ Inez</div>
+          <p>&copy; ${new Date().getFullYear()} Inez. All rights reserved.</p>
+          <p class="email-note">This email was sent to ${email}</p>
+        </div>
+      </div>
+    </body>
+    </html>
+  `,
+}),
 
   adminOrderNotification: (order) => ({
     subject: `🛒 New Order #${order._id}`,

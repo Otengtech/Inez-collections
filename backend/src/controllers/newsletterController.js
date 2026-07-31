@@ -197,3 +197,141 @@ export const sendBulkNewsletter = async (req, res) => {
     });
   }
 };
+
+// controllers/newsletterController.js
+
+// @desc    Delete subscriber (admin only)
+// @route   DELETE /api/newsletter/:id
+// @access  Private/Admin
+export const deleteSubscriber = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const subscriber = await Newsletter.findById(id);
+
+    if (!subscriber) {
+      return res.status(404).json({
+        success: false,
+        message: 'Subscriber not found',
+      });
+    }
+
+    await Newsletter.findByIdAndDelete(id);
+
+    console.log(`🗑️ Subscriber ${id} (${subscriber.email}) deleted successfully`);
+
+    res.json({
+      success: true,
+      message: 'Subscriber deleted successfully',
+    });
+  } catch (error) {
+    console.error('Delete subscriber error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error deleting subscriber',
+      error: error.message,
+    });
+  }
+};
+
+// @desc    Delete multiple subscribers (admin only)
+// @route   DELETE /api/newsletter/bulk-delete
+// @access  Private/Admin
+export const bulkDeleteSubscribers = async (req, res) => {
+  try {
+    const { subscriberIds } = req.body;
+
+    if (!subscriberIds || !subscriberIds.length) {
+      return res.status(400).json({
+        success: false,
+        message: 'Please provide subscriber IDs to delete',
+      });
+    }
+
+    // Check if subscribers exist
+    const subscribers = await Newsletter.find({ _id: { $in: subscriberIds } });
+
+    if (!subscribers.length) {
+      return res.status(404).json({
+        success: false,
+        message: 'No subscribers found to delete',
+      });
+    }
+
+    // Delete all subscribers
+    const result = await Newsletter.deleteMany({ _id: { $in: subscriberIds } });
+
+    console.log(`🗑️ ${result.deletedCount} subscribers deleted successfully`);
+
+    res.json({
+      success: true,
+      message: `${result.deletedCount} subscriber(s) deleted successfully`,
+      deletedCount: result.deletedCount,
+    });
+  } catch (error) {
+    console.error('Bulk delete subscribers error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error deleting subscribers',
+      error: error.message,
+    });
+  }
+};
+
+// @desc    Delete all inactive subscribers (admin only)
+// @route   DELETE /api/newsletter/delete-inactive
+// @access  Private/Admin
+export const deleteInactiveSubscribers = async (req, res) => {
+  try {
+    const result = await Newsletter.deleteMany({ isActive: false });
+
+    console.log(`🗑️ ${result.deletedCount} inactive subscribers deleted successfully`);
+
+    res.json({
+      success: true,
+      message: `${result.deletedCount} inactive subscriber(s) deleted successfully`,
+      deletedCount: result.deletedCount,
+    });
+  } catch (error) {
+    console.error('Delete inactive subscribers error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error deleting inactive subscribers',
+      error: error.message,
+    });
+  }
+};
+
+// @desc    Delete all subscribers (admin only - use with caution)
+// @route   DELETE /api/newsletter/delete-all
+// @access  Private/Admin
+export const deleteAllSubscribers = async (req, res) => {
+  try {
+    const { confirm } = req.query;
+
+    // Safety check - require confirmation
+    if (confirm !== 'true') {
+      return res.status(400).json({
+        success: false,
+        message: 'Please confirm deletion by adding ?confirm=true to the request',
+      });
+    }
+
+    const result = await Newsletter.deleteMany({});
+
+    console.log(`🗑️ ${result.deletedCount} all subscribers deleted successfully`);
+
+    res.json({
+      success: true,
+      message: `${result.deletedCount} subscriber(s) deleted successfully`,
+      deletedCount: result.deletedCount,
+    });
+  } catch (error) {
+    console.error('Delete all subscribers error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error deleting subscribers',
+      error: error.message,
+    });
+  }
+};
