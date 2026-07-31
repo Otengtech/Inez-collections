@@ -1,12 +1,15 @@
 import React, { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faLock, faArrowRight, faTruck, faStore } from '@fortawesome/free-solid-svg-icons'
+import { toast } from 'react-toastify'
 
 const ArrowUpRight = ({ className = '' }) => (
   <FontAwesomeIcon icon={faArrowRight} className={`-rotate-45 ${className}`} />
 )
 
 const OrderForm = ({ onSubmit, loading }) => {
+  const navigate = useNavigate()
   const [formData, setFormData] = useState({
     fullName: '',
     email: '',
@@ -14,6 +17,7 @@ const OrderForm = ({ onSubmit, loading }) => {
     address: '',
     deliveryType: 'delivery', // 'delivery' or 'pickup'
   })
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
   const handleChange = (e) => {
     setFormData({
@@ -22,9 +26,33 @@ const OrderForm = ({ onSubmit, loading }) => {
     })
   }
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
-    onSubmit(formData)
+    
+    // Validate required fields
+    if (!formData.fullName.trim() || !formData.email.trim() || !formData.phone.trim() || !formData.address.trim()) {
+      toast.error('Please fill in all required fields')
+      return
+    }
+
+    setIsSubmitting(true)
+    
+    try {
+      // Call the onSubmit prop (which should handle the API call)
+      const result = await onSubmit(formData)
+      
+      // If order was successful, navigate to orders page
+      if (result && result.success) {
+        toast.success('Order placed successfully! 🎉')
+        // Navigate to orders page with the order ID
+        navigate(`/order-success?orderId=${result.order?._id || result.order?.id || ''}`)
+      }
+    } catch (error) {
+      console.error('Order submission error:', error)
+      toast.error(error.message || 'Failed to place order')
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   return (
@@ -123,11 +151,11 @@ const OrderForm = ({ onSubmit, loading }) => {
 
       <button
         type="submit"
-        disabled={loading}
+        disabled={isSubmitting || loading}
         className="w-full inline-flex items-center justify-center gap-3 bg-black text-white font-semibold pl-6 pr-2 py-3 rounded-full hover:bg-black-800 transition-all duration-300 disabled:opacity-50 group shadow-lg hover:shadow-xl hover:scale-[1.02]"
       >
         <FontAwesomeIcon icon={faLock} className="text-sm" />
-        {loading ? 'Processing...' : 'Place Order'}
+        {isSubmitting || loading ? 'Processing...' : 'Place Order'}
         <span className="w-8 h-8 rounded-full bg-[#D6F04C] text-black flex items-center justify-center shrink-0 transition-all duration-300 group-hover:rotate-12">
           <ArrowUpRight className="text-xs" />
         </span>

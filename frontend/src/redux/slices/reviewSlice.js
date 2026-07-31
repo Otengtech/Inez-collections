@@ -19,6 +19,15 @@ export const fetchReviews = createAsyncThunk(
   }
 )
 
+// reviewSlice.js
+export const fetchProductReviews = createAsyncThunk(
+  'reviews/fetchProductReviews',
+  async (productId) => {
+    const response = await api.get(`/products/${productId}/reviews`)
+    return response.data
+  }
+)
+
 // Add a new review
 export const addReview = createAsyncThunk(
   'reviews/addReview',

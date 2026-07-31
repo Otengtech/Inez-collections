@@ -43,20 +43,11 @@ const Checkout = () => {
     }
   }
 
-  if (items.length === 0) {
-    navigate('/cart')
-    return null
-  }
-
   return (
     <section className="relative pt-28 pb-10 px-4 sm:px-6 lg:px-10 min-h-screen">
       <div className="max-w-7xl mx-auto">
         <div className="relative rounded-[2.5rem] bg-[#EDF1EC] p-4 sm:p-6 md:p-8 lg:p-10 shadow-[0_20px_60px_rgba(0,0,0,0.06)] overflow-hidden">
-          {/* Decorative elements */}
-          <svg className="absolute -top-10 -right-10 w-72 h-72 opacity-[0.15] pointer-events-none" viewBox="0 0 200 200">
-            <circle cx="100" cy="100" r="80" fill="none" stroke="#000" strokeWidth="0.5" />
-            <line x1="0" y1="40" x2="200" y2="0" stroke="#000" strokeWidth="0.5" />
-          </svg>
+
           <div className="absolute top-20 left-10 w-32 h-32 bg-gold-400/5 rounded-full blur-3xl"></div>
           <div className="absolute bottom-20 right-10 w-40 h-40 bg-gold-600/5 rounded-full blur-3xl"></div>
 
@@ -64,7 +55,7 @@ const Checkout = () => {
           <ScrollReveal direction="up">
             <div className="relative text-center mb-10 md:mb-14">
               <span className="inline-block px-4 py-2 bg-white/80 backdrop-blur-sm rounded-full text-sm font-medium text-black/70 mb-4 shadow-sm">
-                🛒 Checkout
+                Checkout
               </span>
               <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold leading-[1.05] mb-3">
                 Complete Your <span className="text-gold-600">Order</span>

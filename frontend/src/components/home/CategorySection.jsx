@@ -163,13 +163,12 @@ const CategorySection = () => {
                     className="group relative bg-transparent rounded-2xl p-4 md:p-5 text-center hover:scale-105 transition-all duration-300 flex flex-col items-center justify-center h-full"
                   >
                     <div
-                      className="w-16 h-16 md:w-20 md:h-20 rounded-full flex items-center justify-center mb-3 transition-all duration-300 group-hover:shadow-lg group-hover:scale-110"
-                      style={{ backgroundColor: category.color }}
+                      className="w-16 h-16 bg-gray-900  md:w-20 md:h-20 rounded-full flex items-center justify-center mb-3 transition-all duration-300 group-hover:shadow-lg group-hover:scale-110"
+                     
                     >
                       <FontAwesomeIcon
                         icon={category.icon}
-                        className="text-2xl md:text-3xl transition-all duration-300"
-                        style={{ color: category.iconColor }}
+                        className="text-2xl md:text-3xl transition-all duration-300 text-[#D6F04C]"
                       />
                     </div>
                     <h3 className="font-medium text-sm md:text-base text-black/80">

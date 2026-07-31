@@ -114,18 +114,18 @@ const HeroSection = () => {
                 </div>
 
                 <div className="flex items-center gap-3 mt-10 relative z-10">
-                  <span className="text-sm text-black/50">Follow us on:</span>
+                  <span className="text-sm text-gray-600">Follow us on:</span>
                   
                   {/* Instagram */}
                   <a
                     href="https://instagram.com/maame_esi67"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="w-8 h-8 rounded-full bg-[#F4F6F2] flex items-center justify-center hover:bg-[#E4405F] hover:text-white transition-all duration-300 group"
+                    className="w-8 h-8 rounded-full bg-gray-900 flex items-center justify-center hover:bg-[#E4405F] hover:text-white transition-all duration-300 group"
                   >
                     <FontAwesomeIcon 
                       icon={faInstagram} 
-                      className="text-black/60 text-xs group-hover:text-white transition-colors" 
+                      className="text-white text-xs group-hover:text-white transition-colors" 
                     />
                   </a>
                   
@@ -134,11 +134,11 @@ const HeroSection = () => {
                     href="https://snapchat.com/add/eee_nez"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="w-8 h-8 rounded-full bg-[#F4F6F2] flex items-center justify-center hover:bg-[#FFFC00] hover:text-black transition-all duration-300 group"
+                    className="w-8 h-8 rounded-full bg-gray-900 flex items-center justify-center hover:bg-[#FFFC00] hover:text-black transition-all duration-300 group"
                   >
                     <FontAwesomeIcon 
                       icon={faSnapchat} 
-                      className="text-black/60 text-xs group-hover:text-black transition-colors" 
+                      className="text-white text-xs group-hover:text-black transition-colors" 
                     />
                   </a>
                 </div>
@@ -169,12 +169,12 @@ const HeroSection = () => {
                         className="group flex flex-col items-center gap-2 p-2 rounded-xl hover:bg-gray-50 transition-colors duration-300"
                       >
                         <div
-                          className="w-14 h-14 rounded-full flex items-center justify-center shadow-md group-hover:scale-110 group-hover:shadow-lg transition-all duration-300 cursor-pointer"
-                          style={{ backgroundColor: c.color }}
+                          className="w-14 h-14 bg-gray-900 rounded-full flex items-center justify-center shadow-md group-hover:scale-110 group-hover:shadow-lg transition-all duration-300 cursor-pointer"
+                        
                         >
                           <FontAwesomeIcon
                             icon={c.icon}
-                            className="text-white text-xl"
+                            className="text-[#D6F04C] text-xl"
                           />
                         </div>
                         <span className="text-xs text-gray-600 font-medium text-center leading-tight">

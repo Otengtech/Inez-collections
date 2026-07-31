@@ -29,6 +29,7 @@ import {
   faEnvelope as faEnvelopeIcon,
 } from '@fortawesome/free-solid-svg-icons'
 import { toggleMobileMenu, closeMobileMenu } from '../../redux/slices/uiSlice'
+import logo from '../../../public/Inez Logo.png'
 
 const Navbar = () => {
   const dispatch = useDispatch()
@@ -67,12 +68,6 @@ const Navbar = () => {
   // Additional links for the navigation dropdown
   const navDropdownLinks = [
     // ============ CATEGORIES ============
-    { name: 'Dresses', path: '/category/dresses', icon: faStar },
-    { name: 'Wigs', path: '/category/wigs', icon: faCrown },
-    { name: 'Lip Gloss', path: '/category/lip-gloss', icon: faPaintBrush },
-    { name: 'Sandals', path: '/category/sandals', icon: faShoePrints },
-    { name: 'Slippers', path: '/category/slippers', icon: faSocks },
-    // ============ OTHER LINKS ============
     { name: 'My Orders', path: '/orders', icon: faBox, section: 'Account' },
     { name: 'About Us', path: '/about', icon: faStore },
   ]
@@ -110,7 +105,7 @@ const Navbar = () => {
         <div className="flex items-center justify-between h-16 gap-3">
           {/* Logo */}
           <Link to="/" className="flex items-center gap-2 flex-shrink-0">
-            <FontAwesomeIcon icon={faCrown} className="text-gold-600 text-xl" />
+           <img src={logo} alt="" className='max-w-8' />
             <span className="text-lg font-bold whitespace-nowrap sm:inline">
               <span className="text-black">Inez</span>
               <span className="text-[#D6F04C]"> Collections</span>

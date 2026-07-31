@@ -9,6 +9,7 @@ import {
   faClock,
   faPaperPlane
 } from '@fortawesome/free-solid-svg-icons'
+
 import {
   faInstagram,
   faSnapchat,
@@ -130,10 +131,10 @@ const Contact = () => {
                       className="w-12 h-12 rounded-2xl flex items-center justify-center shrink-0 transition-all duration-300 group-hover:scale-110"
                       style={{ backgroundColor: info.bgColor }}
                     >
-                      <FontAwesomeIcon 
-                        icon={info.icon} 
+                      <FontAwesomeIcon
+                        icon={info.icon}
                         className="text-lg"
-                        style={{ color: info.color }} 
+                        style={{ color: info.color }}
                       />
                     </div>
                     <div className="min-w-0">
@@ -163,14 +164,14 @@ const Contact = () => {
                 <div className="relative bg-black rounded-[1.75rem] p-6 overflow-hidden flex-1 group hover:shadow-xl transition-all duration-300">
                   <div className="absolute -bottom-10 -right-10 w-40 h-40 bg-[#D6F04C]/10 rounded-full blur-3xl pointer-events-none group-hover:bg-[#D6F04C]/20 transition-all duration-500"></div>
                   <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-[#D6F04C] via-gold-400 to-[#D6F04C] opacity-50"></div>
-                  
+
                   <div className="relative flex items-center gap-3 mb-4">
                     <span className="w-9 h-9 rounded-full bg-white/10 flex items-center justify-center group-hover:bg-white/20 transition-all duration-300">
                       <FontAwesomeIcon icon={faClock} className="text-[#D6F04C] text-sm" />
                     </span>
                     <h3 className="font-semibold text-white text-sm">Business Hours</h3>
                   </div>
-                  
+
                   <div className="relative space-y-2 text-sm text-white/60">
                     <div className="flex justify-between items-center py-1 border-b border-white/5">
                       <span>Monday – Friday</span>
@@ -278,6 +279,35 @@ const Contact = () => {
                   </form>
                 </div>
               </ScrollReveal>
+              <div className="flex items-center gap-3 mt-10 relative z-10">
+                <span className="text-sm text-gray-600">Follow us on:</span>
+
+                {/* Instagram */}
+                <a
+                  href="https://instagram.com/maame_esi67"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-8 h-8 rounded-full bg-gray-900 flex items-center justify-center hover:bg-[#E4405F] hover:text-white transition-all duration-300 group"
+                >
+                  <FontAwesomeIcon
+                    icon={faInstagram}
+                    className="text-white text-xs group-hover:text-white transition-colors"
+                  />
+                </a>
+
+                {/* Snapchat */}
+                <a
+                  href="https://snapchat.com/add/eee_nez"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-8 h-8 rounded-full bg-gray-900 flex items-center justify-center hover:bg-[#FFFC00] hover:text-black transition-all duration-300 group"
+                >
+                  <FontAwesomeIcon
+                    icon={faSnapchat}
+                    className="text-white text-xs group-hover:text-black transition-colors"
+                  />
+                </a>
+              </div>
             </div>
           </div>
         </div>

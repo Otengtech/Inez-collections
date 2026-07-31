@@ -19,8 +19,12 @@ import {
 import {
   faTwitter,
   faTiktok,
-  faInstagram,
   faLinkedin,
+} from '@fortawesome/free-brands-svg-icons'
+import {
+  faInstagram,
+  faSnapchat,
+  faWhatsapp, // ✅ This is in brands package
 } from '@fortawesome/free-brands-svg-icons'
 import ScrollReveal from '../components/common/ScrollReveal'
 import img from '../assets/img1.jpg'
@@ -170,7 +174,7 @@ const About = () => {
                       <span className="text-3xl mb-2 block">🚀</span>
                       <h3 className="font-semibold text-black text-sm">Our Mission</h3>
                       <p className="text-sm text-black/50 mt-1">
-                        To provide affordable, high-quality clothes that hydrates deeply while making self-care feel fun and beautiful. We want every INEZ girl to shine inside and out. 
+                        To provide affordable, high-quality clothes that hydrates deeply while making self-care feel fun and beautiful. We want every INEZ girl to shine inside and out.
                       </p>
                     </div>
                     <div className="w-8 h-8 rounded-full bg-gold-100 flex items-center justify-center relative z-10">
@@ -267,21 +271,34 @@ const About = () => {
           </div>
 
           {/* Social & Footer */}
-          <div className="relative mt-5 flex flex-col sm:flex-row items-center justify-between gap-4">
-            <ScrollReveal direction="up" delay={350}>
-              <div className="flex items-center gap-3">
-                <span className="text-sm text-black/50">Follow us on:</span>
-                {[faTwitter, faTiktok, faInstagram, faLinkedin].map((icon, i) => (
-                  <a
-                    key={i}
-                    href="#"
-                    className="w-10 h-10 rounded-full bg-white flex items-center justify-center hover:bg-gold-50 hover:shadow-md transition-all"
-                  >
-                    <FontAwesomeIcon icon={icon} className="text-black/60 text-sm hover:text-gold-600 transition-colors" />
-                  </a>
-                ))}
-              </div>
-            </ScrollReveal>
+          <div className="flex items-center gap-3 mt-10 relative z-10">
+            <span className="text-sm text-gray-600">Follow us on:</span>
+
+            {/* Instagram */}
+            <a
+              href="https://instagram.com/maame_esi67"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="w-8 h-8 rounded-full bg-gray-900 flex items-center justify-center hover:bg-[#E4405F] hover:text-white transition-all duration-300 group"
+            >
+              <FontAwesomeIcon
+                icon={faInstagram}
+                className="text-white text-xs group-hover:text-white transition-colors"
+              />
+            </a>
+
+            {/* Snapchat */}
+            <a
+              href="https://snapchat.com/add/eee_nez"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="w-8 h-8 rounded-full bg-gray-900 flex items-center justify-center hover:bg-[#FFFC00] hover:text-black transition-all duration-300 group"
+            >
+              <FontAwesomeIcon
+                icon={faSnapchat}
+                className="text-white text-xs group-hover:text-black transition-colors"
+              />
+            </a>
           </div>
         </div>
       </div>

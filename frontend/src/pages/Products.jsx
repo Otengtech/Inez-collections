@@ -6,7 +6,25 @@ import ProductGrid from '../components/products/ProductGrid'
 import ProductFilters from '../components/products/ProductFilters'
 import ScrollReveal from '../components/common/ScrollReveal'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faSearch, faFilter, faTimes } from '@fortawesome/free-solid-svg-icons'
+import { 
+  faSearch, 
+  faFilter, 
+  faTimes, 
+  faSort,
+  faSortAmountDown,
+  faSortAmountUp,
+  faThLarge,
+  faThList,
+  faCheck,
+  faInfoCircle,
+  faTag,
+  faStar,
+  faClock,
+  faTruck,
+  faShoppingBag,
+  faEye,
+  faChevronDown
+} from '@fortawesome/free-solid-svg-icons'
 
 const Products = () => {
   const dispatch = useDispatch()
@@ -16,6 +34,9 @@ const Products = () => {
   const [searchInput, setSearchInput] = useState('')
   const [isFilterOpen, setIsFilterOpen] = useState(false)
   const [isInitialLoad, setIsInitialLoad] = useState(true)
+  const [viewMode, setViewMode] = useState('grid') // 'grid' or 'list'
+  const [sortOpen, setSortOpen] = useState(false)
+  const [showStats, setShowStats] = useState(true)
 
   // Get filters from URL params on mount and when URL changes
   useEffect(() => {
@@ -31,7 +52,6 @@ const Products = () => {
     
     const newFilters = {}
     
-    // ✅ Convert category to lowercase for API
     if (category) {
       newFilters.category = category.toLowerCase()
     }
@@ -47,13 +67,10 @@ const Products = () => {
     if (color) newFilters.color = color
     if (rating) newFilters.rating = rating
     
-    // Only update if there are filters or it's the initial load
     if (Object.keys(newFilters).length > 0 || isInitialLoad) {
-      // Set default sort if not provided
       if (!newFilters.sort && !filters.sort) {
         newFilters.sort = '-createdAt'
       }
-      // Set default page if not provided
       if (!newFilters.page) {
         newFilters.page = 1
       }
@@ -64,25 +81,21 @@ const Products = () => {
 
   // Fetch products when filters change
   useEffect(() => {
-    // Skip initial fetch if no filters are set
     if (!filters || Object.keys(filters).length === 0) {
       return
     }
 
     const fetchData = async () => {
       try {
-        // Build query params
         const queryParams = {}
         Object.keys(filters).forEach(key => {
           if (filters[key] && filters[key] !== '' && key !== 'page') {
             queryParams[key] = filters[key]
           }
         })
-        // Add page if not present
         if (!queryParams.page) {
           queryParams.page = 1
         }
-        // Add sort if not present
         if (!queryParams.sort) {
           queryParams.sort = '-createdAt'
         }
@@ -122,9 +135,30 @@ const Products = () => {
     navigate('/products')
   }
 
+  const handleSortChange = (sortValue) => {
+    dispatch(setFilters({ sort: sortValue, page: 1 }))
+    const params = new URLSearchParams(searchParams)
+    params.set('sort', sortValue)
+    navigate(`/products?${params.toString()}`)
+    setSortOpen(false)
+  }
+
   const activeFilterCount = Object.keys(filters).filter(k => 
     filters[k] && k !== 'page' && k !== 'sort' && filters[k] !== '' && k !== 'limit'
   ).length
+
+  const sortOptions = [
+    { value: '-createdAt', label: 'Newest First', icon: faClock },
+    { value: 'price', label: 'Price: Low to High', icon: faSortAmountUp },
+    { value: '-price', label: 'Price: High to Low', icon: faSortAmountDown },
+    { value: 'name', label: 'Name: A to Z', icon: faSort },
+    { value: '-rating', label: 'Highest Rated', icon: faStar },
+  ]
+
+  const getSortLabel = () => {
+    const option = sortOptions.find(o => o.value === filters.sort)
+    return option ? option.label : 'Sort by'
+  }
 
   if (error) {
     return (
@@ -196,57 +230,163 @@ const Products = () => {
         </div>
       )}
 
-      <div className="container-custom">
+      <div className="container-custom max-w-7xl mx-auto">
         {/* Header */}
         <ScrollReveal direction="up">
-          <div className="text-center mb-8">
+          <div className="text-center mb-6">
             <h1 className="text-3xl md:text-4xl font-bold mb-2">
               Our <span className="text-[#D6F04C]">Collection</span>
             </h1>
             <p className="text-black/60 max-w-2xl mx-auto">
               Explore our curated selection of premium fashion items
             </p>
-            {activeFilterCount > 0 && (
-              <p className="text-sm text-gray-500 mt-2">
-                {activeFilterCount} filter{activeFilterCount > 1 ? 's' : ''} active
-              </p>
-            )}
           </div>
         </ScrollReveal>
 
-        {/* Search Bar */}
+        {/* Search and Controls */}
         <ScrollReveal direction="up" delay={100}>
-          <form onSubmit={handleSearch} className="max-w-md mx-auto mb-8">
-            <div className="relative">
-              <input
-                type="text"
-                value={searchInput}
-                onChange={(e) => setSearchInput(e.target.value)}
-                placeholder="Search products..."
-                className="w-full px-5 py-3 bg-white border border-gray-200 rounded-full focus:outline-none focus:border-[#D6F04C] focus:ring-2 focus:ring-[#D6F04C]/30 transition-all shadow-sm"
-              />
-              <button
-                type="submit"
-                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-[#D6F04C] transition-colors"
-              >
-                <FontAwesomeIcon icon={faSearch} />
-              </button>
-              {searchInput && (
+          <div className="flex flex-col md:flex-row gap-4 mb-6">
+            {/* Search Bar */}
+            <form onSubmit={handleSearch} className="flex-1">
+              <div className="relative">
+                <input
+                  type="text"
+                  value={searchInput}
+                  onChange={(e) => setSearchInput(e.target.value)}
+                  placeholder="Search products by name, category, or keyword..."
+                  className="w-full px-5 py-3 bg-white border border-gray-200 rounded-full focus:outline-none focus:border-[#D6F04C] focus:ring-2 focus:ring-[#D6F04C]/30 transition-all shadow-sm pl-12"
+                />
+                <FontAwesomeIcon 
+                  icon={faSearch} 
+                  className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400" 
+                />
                 <button
-                  type="button"
-                  onClick={() => {
-                    setSearchInput('')
-                    dispatch(setFilters({ search: '', page: 1 }))
-                    navigate('/products')
-                  }}
-                  className="absolute right-12 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+                  type="submit"
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2 bg-[#D6F04C] text-black px-4 py-1.5 rounded-full text-sm font-medium hover:bg-[#C5E043] transition-colors"
                 >
-                  <FontAwesomeIcon icon={faTimes} className="text-sm" />
+                  Search
                 </button>
-              )}
+                {searchInput && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setSearchInput('')
+                      dispatch(setFilters({ search: '', page: 1 }))
+                      navigate('/products')
+                    }}
+                    className="absolute right-24 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+                  >
+                    <FontAwesomeIcon icon={faTimes} className="text-sm" />
+                  </button>
+                )}
+              </div>
+            </form>
+
+            {/* Controls */}
+            <div className="flex items-center gap-3 flex-wrap">
+              {/* Sort Dropdown */}
+              <div className="relative">
+                <button
+                  onClick={() => setSortOpen(!sortOpen)}
+                  className="flex items-center gap-2 px-4 py-3 bg-white border border-gray-200 rounded-full hover:border-[#D6F04C] transition-all shadow-sm text-sm font-medium text-gray-700"
+                >
+                  <FontAwesomeIcon icon={faSort} />
+                  {getSortLabel()}
+                  <FontAwesomeIcon icon={faChevronDown} className="text-xs" />
+                </button>
+                {sortOpen && (
+                  <div className="absolute right-0 mt-2 w-56 bg-white rounded-xl shadow-lg border border-gray-100 py-2 z-30 animate-fade-in">
+                    {sortOptions.map((option) => (
+                      <button
+                        key={option.value}
+                        onClick={() => handleSortChange(option.value)}
+                        className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-[#F4F6F2] transition-colors text-left"
+                      >
+                        <FontAwesomeIcon icon={option.icon} className="text-gray-400 text-xs" />
+                        {option.label}
+                        {filters.sort === option.value && (
+                          <FontAwesomeIcon icon={faCheck} className="ml-auto text-[#D6F04C] text-xs" />
+                        )}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* View Mode Toggle */}
+              <div className="flex bg-white border border-gray-200 rounded-full overflow-hidden shadow-sm">
+                <button
+                  onClick={() => setViewMode('grid')}
+                  className={`px-3 py-2 text-sm transition-colors ${
+                    viewMode === 'grid' 
+                      ? 'bg-[#D6F04C] text-black' 
+                      : 'text-gray-400 hover:text-gray-600'
+                  }`}
+                >
+                  <FontAwesomeIcon icon={faThLarge} />
+                </button>
+                <button
+                  onClick={() => setViewMode('list')}
+                  className={`px-3 py-2 text-sm transition-colors ${
+                    viewMode === 'list' 
+                      ? 'bg-[#D6F04C] text-black' 
+                      : 'text-gray-400 hover:text-gray-600'
+                  }`}
+                >
+                  <FontAwesomeIcon icon={faThList} />
+                </button>
+              </div>
+
+              {/* Stats Toggle */}
+              <button
+                onClick={() => setShowStats(!showStats)}
+                className="px-3 py-2 text-sm text-gray-400 hover:text-gray-600 transition-colors"
+              >
+                <FontAwesomeIcon icon={faInfoCircle} />
+              </button>
             </div>
-          </form>
+          </div>
         </ScrollReveal>
+
+        {/* Stats Bar */}
+        {showStats && (
+          <ScrollReveal direction="up" delay={150}>
+            <div className="flex flex-wrap items-center justify-between gap-3 bg-white rounded-2xl px-4 py-3 mb-6 shadow-sm border border-gray-100">
+              <div className="flex items-center gap-4 text-sm">
+                <span className="font-medium text-gray-700">
+                  {pagination?.total || 0} Products
+                </span>
+                <span className="text-gray-300">|</span>
+                <span className="text-gray-500">
+                  Showing {products.length} items
+                </span>
+                {activeFilterCount > 0 && (
+                  <>
+                    <span className="text-gray-300">|</span>
+                    <span className="text-[#D6F04C] font-medium">
+                      {activeFilterCount} filter{activeFilterCount > 1 ? 's' : ''} active
+                    </span>
+                  </>
+                )}
+              </div>
+              <div className="flex items-center gap-3">
+                {activeFilterCount > 0 && (
+                  <button
+                    onClick={handleClearFilters}
+                    className="text-sm text-red-500 hover:text-red-600 transition-colors flex items-center gap-1"
+                  >
+                    <FontAwesomeIcon icon={faTimes} className="text-xs" />
+                    Clear all
+                  </button>
+                )}
+                <div className="flex items-center gap-1 text-xs text-gray-400">
+                  <FontAwesomeIcon icon={faEye} />
+                  <span>View: {viewMode === 'grid' ? 'Grid' : 'List'}</span>
+                </div>
+              </div>
+            </div>
+          </ScrollReveal>
+        )}
 
         {/* Main Content */}
         <div className="flex flex-col lg:flex-row gap-8 items-start">
@@ -259,52 +399,68 @@ const Products = () => {
 
           {/* Products Grid */}
           <div className="flex-1 min-w-0 w-full">
-            <ProductGrid products={products} loading={loading} columns={4} />
+            <ProductGrid 
+              products={products} 
+              loading={loading} 
+              columns={viewMode === 'grid' ? 4 : 1} 
+              viewMode={viewMode}
+            />
             
             {/* Pagination */}
             {pagination && pagination.pages > 1 && (
-              <div className="flex justify-center gap-2 mt-8 pb-8 flex-wrap">
-                <button
-                  onClick={() => handlePageChange(pagination.page - 1)}
-                  disabled={pagination.page === 1}
-                  className={`px-4 py-2 rounded-lg transition-all ${
-                    pagination.page === 1
-                      ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                      : 'bg-gray-100 hover:bg-gray-200 text-gray-700'
-                  }`}
-                >
-                  Previous
-                </button>
-                {[...Array(Math.min(pagination.pages, 5))].map((_, i) => {
-                  const pageNum = i + 1
-                  return (
-                    <button
-                      key={i}
-                      onClick={() => handlePageChange(pageNum)}
-                      className={`w-10 h-10 rounded-lg transition-all ${
-                        pagination.page === pageNum
-                          ? 'bg-[#D6F04C] text-black shadow-md'
-                          : 'bg-gray-100 hover:bg-gray-200 text-gray-700'
-                      }`}
-                    >
-                      {pageNum}
-                    </button>
-                  )
-                })}
-                {pagination.pages > 5 && (
-                  <span className="flex items-center px-2 text-gray-400">...</span>
-                )}
-                <button
-                  onClick={() => handlePageChange(pagination.page + 1)}
-                  disabled={pagination.page === pagination.pages}
-                  className={`px-4 py-2 rounded-lg transition-all ${
-                    pagination.page === pagination.pages
-                      ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                      : 'bg-gray-100 hover:bg-gray-200 text-gray-700'
-                  }`}
-                >
-                  Next
-                </button>
+              <div className="flex flex-wrap items-center justify-between gap-4 mt-8 pb-8">
+                <div className="text-sm text-gray-500">
+                  Showing {((pagination.page - 1) * pagination.limit) + 1} - {Math.min(pagination.page * pagination.limit, pagination.total)} of {pagination.total} products
+                </div>
+                <div className="flex gap-2 flex-wrap">
+                  <button
+                    onClick={() => handlePageChange(pagination.page - 1)}
+                    disabled={pagination.page === 1}
+                    className={`px-4 py-2 rounded-lg transition-all ${
+                      pagination.page === 1
+                        ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                        : 'bg-gray-100 hover:bg-gray-200 text-gray-700'
+                    }`}
+                  >
+                    Previous
+                  </button>
+                  {[...Array(Math.min(pagination.pages, 5))].map((_, i) => {
+                    let pageNum
+                    if (pagination.pages <= 5) {
+                      pageNum = i + 1
+                    } else if (pagination.page <= 3) {
+                      pageNum = i + 1
+                    } else if (pagination.page >= pagination.pages - 2) {
+                      pageNum = pagination.pages - 4 + i
+                    } else {
+                      pageNum = pagination.page - 2 + i
+                    }
+                    return (
+                      <button
+                        key={i}
+                        onClick={() => handlePageChange(pageNum)}
+                        className={`w-10 h-10 rounded-lg transition-all ${
+                          pagination.page === pageNum
+                            ? 'bg-[#D6F04C] text-black shadow-md'
+                            : 'bg-gray-100 hover:bg-gray-200 text-gray-700'
+                        }`}
+                      >
+                        {pageNum}
+                      </button>
+                    )
+                  })}
+                  <button
+                    onClick={() => handlePageChange(pagination.page + 1)}
+                    disabled={pagination.page === pagination.pages}
+                    className={`px-4 py-2 rounded-lg transition-all ${
+                      pagination.page === pagination.pages
+                        ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                        : 'bg-gray-100 hover:bg-gray-200 text-gray-700'
+                    }`}
+                  >
+                    Next
+                  </button>
+                </div>
               </div>
             )}
           </div>
