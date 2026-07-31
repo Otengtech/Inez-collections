@@ -159,11 +159,11 @@ const ProductDetails = ({ product }) => {
           {/* LEFT - Images */}
           <ScrollReveal direction="left">
             <div>
-              <div className="relative aspect-square rounded-[2rem] overflow-hidden bg-[#F4F6F2]">
+              <div className="relative flex items-center justify-center aspect-square rounded-[2rem] overflow-hidden bg-[#F4F6F2]">
                 <img
                   src={mainImage}
                   alt={product.name}
-                  className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
+                  className="max-w-64 h-full object-contain transition-transform duration-500 hover:scale-105"
                 />
                 
                 {product.stock === 0 && (
